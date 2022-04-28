@@ -1,5 +1,7 @@
 package farsharing.server.model.entity;
 
+import farsharing.server.model.entity.enumerate.ClientStatus;
+import farsharing.server.model.entity.enumerate.ContractStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,9 +31,8 @@ public class ContractEntity {
     @JoinColumn(name = "car_uid", referencedColumnName = "uid", nullable = false)
     private CarEntity car;
 
-    @ManyToOne
-    @JoinColumn(name = "status", referencedColumnName = "status", nullable = false)
-    private ContractStatusEntity status;
+    @Enumerated(EnumType.STRING)
+    private ContractStatus status;
 
     @Column(name = "start_time", nullable = false)
     private ZonedDateTime startTime;

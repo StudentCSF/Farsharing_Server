@@ -1,5 +1,7 @@
 package farsharing.server.model.entity;
 
+import farsharing.server.model.entity.enumerate.ClientStatus;
+import farsharing.server.model.entity.enumerate.UserRole;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,7 +31,6 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "role_name", referencedColumnName = "name", nullable = false)
-    private UserRoleEntity role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 }

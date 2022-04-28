@@ -1,6 +1,7 @@
 package farsharing.server.model.entity;
 
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
+import farsharing.server.model.entity.enumerate.ClientStatus;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -56,8 +57,7 @@ public class ClientEntity {
     @Embedded()
     private WalletEmbeddable wallet;
 
-    @ManyToOne
-    @JoinColumn(name = "client_status", referencedColumnName = "status", nullable = false)
-    private ClientStatusEntity status;
+    @Enumerated(EnumType.STRING)
+    private ClientStatus status;
 
 }
