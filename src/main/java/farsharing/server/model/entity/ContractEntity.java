@@ -18,7 +18,6 @@ import java.util.UUID;
 public class ContractEntity {
 
     @Id
-    @GeneratedValue
     private UUID uid;
 
     @ManyToOne

@@ -22,7 +22,6 @@ import java.util.UUID;
 public class ClientEntity {
 
     @Id
-    @GeneratedValue
     private UUID uid;
 
     @OneToOne

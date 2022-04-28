@@ -20,8 +20,6 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    @GeneratedValue
-    @Column(updatable = false, insertable = false)
     private UUID uid;
 
     @Column(nullable = false)
