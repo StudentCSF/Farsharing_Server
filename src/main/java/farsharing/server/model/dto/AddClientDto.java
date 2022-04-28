@@ -1,5 +1,7 @@
 package farsharing.server.model.dto;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.Data;
@@ -34,6 +36,7 @@ public class AddClientDto {
     @Pattern(regexp = "^(0[1-9]|1[12])/[0-9]{2}$")
     private String validThru;
 
-    @Pattern(regexp = "^[1-9][0-9]{2}$")
-    private String cvv;
+    @Min(100)
+    @Max(999)
+    private Integer cvv;
 }
