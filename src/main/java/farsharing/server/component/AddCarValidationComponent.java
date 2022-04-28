@@ -1,6 +1,6 @@
 package farsharing.server.component;
 
-import farsharing.server.model.dto.AddClientDto;
+import farsharing.server.model.dto.AddCarDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,17 +9,17 @@ import javax.validation.Validator;
 import java.util.Set;
 
 @Component
-public class AddClientValidationComponent {
+public class AddCarValidationComponent {
 
     private final Validator validator;
 
     @Autowired
-    public AddClientValidationComponent(Validator validator) {
+    public AddCarValidationComponent(Validator validator) {
         this.validator = validator;
     }
 
-    public boolean isValid(AddClientDto addClientDto) {
-        Set<ConstraintViolation<AddClientDto>> errors = validator.validate(addClientDto);
+    public boolean isValid(AddCarDto addCarDto) {
+        Set<ConstraintViolation<AddCarDto>> errors = validator.validate(addCarDto);
         return errors.isEmpty();
     }
 }

@@ -1,9 +1,7 @@
 package farsharing.server.model.dto;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
+
 import lombok.Data;
 
 import java.util.UUID;
@@ -11,7 +9,7 @@ import java.util.UUID;
 @Data
 public class AddClientDto {
 
-    @NotBlank
+    @NotNull
     private UUID UserUid;
 
     @NotBlank
