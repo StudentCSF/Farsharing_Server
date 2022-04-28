@@ -20,7 +20,6 @@ public class ContractEntity {
 
     @Id
     @GeneratedValue
-    @Column(updatable = false, insertable = false)
     private UUID uid;
 
     @ManyToOne
@@ -32,6 +31,7 @@ public class ContractEntity {
     private CarEntity car;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ContractStatus status;
 
     @Column(name = "start_time", nullable = false)

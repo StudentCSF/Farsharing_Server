@@ -19,7 +19,6 @@ import java.util.UUID;
 @Table(name = "client",
         uniqueConstraints = {
                 @UniqueConstraint(name = "license_un", columnNames = "driver_license"),
-                @UniqueConstraint(name = "phone_un", columnNames = "phone_number"),
                 @UniqueConstraint(name = "user_un", columnNames = "user_uid")
         })
 public class ClientEntity {
@@ -30,7 +29,6 @@ public class ClientEntity {
 
     @OneToOne
     @JoinColumn(name = "user_uid", referencedColumnName = "uid")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity user;
 
     @Column(nullable = false, name = "driver_license")
@@ -48,16 +46,17 @@ public class ClientEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "accidents_count")
+    @Column(name = "accidents_count", nullable = false)
     private Integer accidents;
 
     @Embedded()
     private WalletEmbeddable wallet;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "status")
     private ClientStatus status;
 
 }
