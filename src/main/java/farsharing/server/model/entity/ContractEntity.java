@@ -1,6 +1,5 @@
 package farsharing.server.model.entity;
 
-import farsharing.server.model.entity.enumerate.ClientStatus;
 import farsharing.server.model.entity.enumerate.ContractStatus;
 import lombok.*;
 

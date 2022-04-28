@@ -3,8 +3,6 @@ package farsharing.server.model.entity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.model.entity.enumerate.ClientStatus;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.UUID;

@@ -1,7 +1,8 @@
 package farsharing.server.service;
 
-//import farsharing.server.component.AddClientValidationComponent;
+import farsharing.server.component.AddClientValidationComponent;
 
+import farsharing.server.exception.RequestNotValidException;
 import farsharing.server.exception.UserNotFoundException;
 import farsharing.server.model.dto.AddClientDto;
 import farsharing.server.model.entity.UserEntity;
@@ -17,28 +18,21 @@ public class ClientService {
 
     private final UserRepository userRepository;
 
-//    private final AddClientValidationComponent addClientValidationComponent;
+    private final AddClientValidationComponent addClientValidationComponent;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, UserRepository userRepository){//, AddClientValidationComponent addClientValidationComponent) {
+    public ClientService(ClientRepository clientRepository, UserRepository userRepository, AddClientValidationComponent addClientValidationComponent) {
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
-//        this.addClientValidationComponent = addClientValidationComponent;
+        this.addClientValidationComponent = addClientValidationComponent;
     }
 
     public void addClient(AddClientDto clientDto) {
-//        if (!addClientValidationComponent.isValid(clientDto)) {
-//            throw new RequestNotValidException();
-//        }
+        if (!addClientValidationComponent.isValid(clientDto)) {
+            throw new RequestNotValidException();
+        }
         UserEntity userEntity = userRepository.findById(
                 clientDto.getUserUid())
                 .orElseThrow(UserNotFoundException::new);
-//        clientRepository.save(ClientEntity.builder()
-//                        .accidents(0)
-//                        .address(clientDto.getAddress())
-//                        .firstName(clientDto.getFirstName())
-//                        .lastName(clientDto.getLastName())
-//                        .status()
-//                .build())
     }
 }
