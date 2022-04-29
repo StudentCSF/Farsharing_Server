@@ -1,13 +1,6 @@
 package farsharing.server.api;
 
-//import farsherver.server.model.entity.AdminEntity;
-
-import farsharing.server.model.entity.UserEntity;
 import farsharing.server.repository.UserRepository;
-//import farsharing.server.repository.UserRoleRepository;
-//import farsharing.server.model.entity.UserRoleEntity;
-//import farsherver.server.model.entity.embeddable.UserIdEmbeddable;
-//import farsherver.server.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

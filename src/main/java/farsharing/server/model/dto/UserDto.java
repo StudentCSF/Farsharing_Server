@@ -6,14 +6,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class AddUserDto {
+public class UserDto {
 
     @Pattern(regexp = "^.+@.+$")
     private String email;
 
     @NotBlank
     private String password;
-
-    @NotBlank
-    private String role;
 }
