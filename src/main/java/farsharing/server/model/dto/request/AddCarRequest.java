@@ -1,4 +1,4 @@
-package farsharing.server.model.dto;
+package farsharing.server.model.dto.request;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
-public class AddCarDto {
+public class AddCarRequest {
 
     @NotBlank
     private String brand;

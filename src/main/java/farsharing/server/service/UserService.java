@@ -1,7 +1,7 @@
 package farsharing.server.service;
 
 import farsharing.server.exception.UserAlreadyExistsException;
-import farsharing.server.model.dto.AddUserDto;
+import farsharing.server.model.dto.request.AddUserRequest;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.UserRepository;
@@ -24,16 +24,16 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public void addUser(AddUserDto addUserDto) {
-        if (this.userRepository.findByEmail(addUserDto.getEmail()).isPresent()) {
+    public void addUser(AddUserRequest addUserRequest) {
+        if (this.userRepository.findByEmail(addUserRequest.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
 
         this.userRepository.save(UserEntity.builder()
                 .role(UserRole.CLIENT)
                 .uid(UUID.randomUUID())
-                .email(addUserDto.getEmail())
-                .password(this.bCryptPasswordEncoder.encode(addUserDto.getPassword()))
+                .email(addUserRequest.getEmail())
+                .password(this.bCryptPasswordEncoder.encode(addUserRequest.getPassword()))
                 .build());
     }
 }
