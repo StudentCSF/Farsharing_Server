@@ -1,4 +1,4 @@
-package farsharing.server.model.dto;
+package farsharing.server.model.dto.request;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class AddUserDto {
+public class AddUserRequest {
 
     @Pattern(regexp = "^.+@.+$")
     private String email;

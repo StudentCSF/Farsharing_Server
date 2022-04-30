@@ -1,11 +1,10 @@
 package farsharing.server.service;
 
-import farsharing.server.exception.RequestNotValidException;
-import farsharing.server.model.dto.AddUserDto;
+import farsharing.server.exception.UserAlreadyExistsException;
+import farsharing.server.model.dto.request.AddUserRequest;
 import farsharing.server.model.entity.UserEntity;
-import farsharing.server.model.entity.UserRoleEntity;
+import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.UserRepository;
-import farsharing.server.repository.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,29 +16,24 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final UserRoleRepository userRoleRepository;
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
-        this.userRoleRepository = userRoleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    private void addUser(AddUserDto addUserDto) {
-        UserRoleEntity userRoleEntity = this.userRoleRepository.findById(addUserDto.getRole()).orElseThrow(() -> new RequestNotValidException("User role does not exist"));
-        this.userRepository.save(
-                UserEntity.builder()
-                        .email(addUserDto.getEmail())
-                        .password(bCryptPasswordEncoder.encode(addUserDto.getPassword()))
-                        .role(userRoleEntity)
-                        .build()
-        );
-    }
+    public void addUser(AddUserRequest addUserRequest) {
+        if (this.userRepository.findByEmail(addUserRequest.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException();
+        }
 
-    private void removeUser(UUID userUid) {
-        this.userRepository.deleteById(userUid);
+        this.userRepository.save(UserEntity.builder()
+                .role(UserRole.CLIENT)
+                .uid(UUID.randomUUID())
+                .email(addUserRequest.getEmail())
+                .password(this.bCryptPasswordEncoder.encode(addUserRequest.getPassword()))
+                .build());
     }
 }

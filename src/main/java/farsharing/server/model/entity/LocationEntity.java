@@ -16,7 +16,6 @@ import java.util.UUID;
 public class LocationEntity {
 
     @Id
-    @GeneratedValue
     private UUID uid;
 
     @Column(nullable = false, name = "country")
