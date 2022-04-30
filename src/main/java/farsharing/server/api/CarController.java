@@ -57,8 +57,8 @@ public class CarController {
         return carEntityList.stream()
                 .map(item -> BriefCarInfoResponse.builder()
                         .brand(item.getBrand())
-                        .pricePerHour(item.getPricePerHour())
-                        .uid(item.getUid())
+                        .isAvailable(item.getIsAvailable())
+                        .stateNumber(item.getStateNumber())
                         .model(item.getModel())
                         .build())
                 .collect(Collectors.toList());
