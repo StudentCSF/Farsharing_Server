@@ -1,4 +1,4 @@
-package farsharing.server.model.dto;
+package farsharing.server.model.dto.request;
 
 import javax.validation.constraints.*;
 
@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class AddClientDto {
+public class AddClientRequest {
 
     @NotNull
     private UUID UserUid;

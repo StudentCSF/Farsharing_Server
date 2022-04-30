@@ -4,7 +4,7 @@ import farsharing.server.component.AddClientValidationComponent;
 
 import farsharing.server.exception.RequestNotValidException;
 import farsharing.server.exception.UserNotFoundException;
-import farsharing.server.model.dto.AddClientDto;
+import farsharing.server.model.dto.request.AddClientRequest;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
@@ -32,7 +32,7 @@ public class ClientService {
         this.addClientValidationComponent = addClientValidationComponent;
     }
 
-    public void addClient(AddClientDto clientDto) {
+    public void addClient(AddClientRequest clientDto) {
         if (!this.addClientValidationComponent.isValid(clientDto)) {
             throw new RequestNotValidException();
         }
