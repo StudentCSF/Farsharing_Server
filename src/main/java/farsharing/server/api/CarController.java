@@ -1,6 +1,7 @@
 package farsharing.server.api;
 
 import farsharing.server.model.dto.request.AddCarRequest;
+import farsharing.server.model.dto.request.UpdateCarRequest;
 import farsharing.server.model.dto.response.BriefCarInfoResponse;
 import farsharing.server.model.entity.CarEntity;
 import farsharing.server.service.CarService;
@@ -43,5 +44,15 @@ public class CarController {
                         .model(item.getModel())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @DeleteMapping("/api/car/{uid}")
+    public void deleteCar(@PathVariable("uid") UUID uid) {
+        this.carService.removeCar(uid);
+    }
+
+    @PutMapping("/api/car/{uid}")
+    public void updateCar(@RequestBody UpdateCarRequest updateCarRequest, @PathVariable UUID uid) {
+        this.carService.updateCar(updateCarRequest, uid);
     }
 }

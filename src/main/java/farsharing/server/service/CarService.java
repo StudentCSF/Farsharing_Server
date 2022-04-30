@@ -1,11 +1,10 @@
 package farsharing.server.service;
 
 import farsharing.server.component.AddCarValidationComponent;
-import farsharing.server.exception.BodyTypeNotFoundException;
-import farsharing.server.exception.CarNotFoundException;
-import farsharing.server.exception.ColorNotFoundException;
-import farsharing.server.exception.RequestNotValidException;
+import farsharing.server.component.UpdateCarValidationComponent;
+import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.AddCarRequest;
+import farsharing.server.model.dto.request.UpdateCarRequest;
 import farsharing.server.model.entity.BodyTypeEntity;
 import farsharing.server.model.entity.CarEntity;
 import farsharing.server.model.entity.ColorEntity;
@@ -33,13 +32,16 @@ public class CarService {
 
     private final AddCarValidationComponent addCarValidationComponent;
 
+    private final UpdateCarValidationComponent updateCarValidationComponent;
+
     @Autowired
-    public CarService(CarRepository carRepository, BodyTypeRepository bodyTypeRepository, LocationRepository locationRepository, ColorRepository colorRepository, AddCarValidationComponent addCarValidationComponent) {
+    public CarService(CarRepository carRepository, BodyTypeRepository bodyTypeRepository, LocationRepository locationRepository, ColorRepository colorRepository, AddCarValidationComponent addCarValidationComponent, UpdateCarValidationComponent updateCarValidationComponent) {
         this.carRepository = carRepository;
         this.bodyTypeRepository = bodyTypeRepository;
         this.locationRepository = locationRepository;
         this.colorRepository = colorRepository;
         this.addCarValidationComponent = addCarValidationComponent;
+        this.updateCarValidationComponent = updateCarValidationComponent;
     }
 
     public void addCar(AddCarRequest addCarRequest) {
@@ -76,5 +78,38 @@ public class CarService {
 
     public List<CarEntity> getCars() {
         return this.carRepository.findAll();
+    }
+
+    public void removeCar(UUID uid) {
+        this.carRepository.deleteById(uid);
+    }
+
+    public void updateCar(UpdateCarRequest updateCarRequest, UUID uid) {
+        if (!this.updateCarValidationComponent.isValid(updateCarRequest)) {
+            throw new RequestNotValidException();
+        }
+        CarEntity carEntity = this.carRepository.findById(uid)
+                .orElseThrow(CarNotFoundException::new);
+
+        carEntity.setBodyType(this.bodyTypeRepository.findById(updateCarRequest.getBodyType())
+                .orElseThrow(BodyTypeNotFoundException::new));
+
+        carEntity.setPricePerHour(updateCarRequest.getPricePerHour());
+
+        carEntity.setBrand(updateCarRequest.getBrand());
+
+        carEntity.setColor(this.colorRepository.findById(updateCarRequest.getColor())
+                .orElseThrow(ColorNotFoundException::new));
+
+        carEntity.setLocation(this.locationRepository.findById(updateCarRequest.getLocation())
+                .orElse(null));
+
+        carEntity.setMileage(updateCarRequest.getMileage());
+
+        carEntity.setModel(updateCarRequest.getModel());
+
+        carEntity.setIsAvailable(updateCarRequest.getIsAvailable());
+
+        this.carRepository.save(carEntity);
     }
 }
