@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/fartest
-    username: postgres
-    password: Victor
+    url: jdbc:postgresql://ec2-52-214-23-110.eu-west-1.compute.amazonaws.com:5432/daugtj3u6u11ip
+    username: yrlieieqhndrzy
+    password: 5625c2866e82b1555872d707ed9bf13b9dd7e016cf499cd5c3e8f29189cd4283
 #  jpa:
 #    hibernate:
 #      ddl-auto: create-drop
