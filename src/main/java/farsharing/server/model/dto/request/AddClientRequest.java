@@ -37,16 +37,15 @@ public class AddClientRequest {
     @Schema(description = "Номер телефона")
     private String phoneNumber;
 
-    @Pattern(regexp = "^[0-9]{16}$")
+    @Pattern(regexp = "^([0-9]{16})?$")
     @Schema(description = "Номер кредитной карты")
     private String cardNumber;
 
-    @Pattern(regexp = "^(0[1-9]|1[12])/[0-9]{2}$")
+    @Pattern(regexp = "^((0[1-9]|1[12])/[0-9]{2})?$")
     @Schema(description = "Срок действия кредитной карты")
     private String validThru;
 
-    @Min(100)
-    @Max(999)
+    @Pattern(regexp = "^([1-9][0-9]{2})?$")
     @Schema(description = "CVV-код кредитной карты")
     private Integer cvv;
 }
