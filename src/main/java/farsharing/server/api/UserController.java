@@ -3,6 +3,7 @@ package farsharing.server.api;
 import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class UserController {
 
 
     @GetMapping("/api/user/activate/{uid}/{code}")
+    @Operation(summary = "Активация учетной записи",
+            description = "Позволяет активировать учетную запись")
     public boolean activateAccount(
             @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid,
             @PathVariable("code") @Parameter(description = "Переданный пользователем код активации") Integer code
@@ -30,14 +33,18 @@ public class UserController {
         return this.userService.activateAccount(uid, code);
     }
 
-    @GetMapping("/api/user/{uid}")
-    public UserEntity getUser(
-            @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
-    ) {
-        return this.userService.getUser(uid);
-    }
+//    @GetMapping("/api/user/{uid}")
+//    @Operation(summary = "Получение данных учетной записи пользователя",
+//            description = "Позволяет обновить данные о клиенте")
+//    public UserEntity getUser(
+//            @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
+//    ) {
+//        return this.userService.getUser(uid);
+//    }
 
     @DeleteMapping("/api/user/{uid}")
+    @Operation(summary = "Удаление пользователя",
+            description = "Позволяет перманентно деактивировать учетную запись")
     public void deleteUser(
             @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
     ) {
@@ -45,6 +52,8 @@ public class UserController {
     }
 
     @PutMapping("/api/user/{uid}")
+    @Operation(summary = "Обновление учетных данных пользователя",
+            description = "Позволяет обновить учетные данные пользователя")
     public void updateUser(
             @RequestBody UserRequest userRequest,
             @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
