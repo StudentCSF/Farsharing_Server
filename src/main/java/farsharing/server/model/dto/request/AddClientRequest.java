@@ -1,19 +1,22 @@
 package farsharing.server.model.dto.request;
 
-import javax.validation.constraints.*;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.UUID;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Data
 @Schema(description = "Сущность для добавления клиентов")
 public class AddClientRequest {
 
-    @NotNull
-    @Schema(description = "Идентификатор пользователя (не клиента)")
-    private UUID UserUid;
+    @Pattern(regexp = "^.+@.+$")
+    @Schema(description = "Адрес электронной почты")
+    private String email;
+
+    @NotBlank
+    @Schema(description = "Пароль")
+    private String password;
 
     @NotBlank
     @Schema(description = "Номер водительской лицензии")
@@ -33,7 +36,7 @@ public class AddClientRequest {
     @Schema(description = "Адрес")
     private String address;
 
-    @NotBlank
+    @Pattern(regexp = "[1-9][0-9]{10}")
     @Schema(description = "Номер телефона")
     private String phoneNumber;
 
@@ -47,5 +50,5 @@ public class AddClientRequest {
 
     @Pattern(regexp = "^([1-9][0-9]{2})?$")
     @Schema(description = "CVV-код кредитной карты")
-    private Integer cvv;
+    private String cvv;
 }

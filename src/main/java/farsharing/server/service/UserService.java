@@ -1,14 +1,12 @@
 package farsharing.server.service;
 
 import farsharing.server.component.UserRequestValidationComponent;
-import farsharing.server.exception.RequestNotValidException;
-import farsharing.server.exception.SuchEmailAlreadyExistException;
-import farsharing.server.exception.UserAlreadyExistsException;
-import farsharing.server.exception.UserNotFoundException;
+import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,21 +31,49 @@ public class UserService {
         this.userRequestValidationComponent = userRequestValidationComponent;
     }
 
-    public void addUser(UserRequest userRequest) {
-        if (!this.userRequestValidationComponent.isValid(userRequest)) {
-            throw new RequestNotValidException();
-        }
-
-        if (this.userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+    public UUID addUser(String login, String password) {
+        if (this.userRepository.findByEmail(login).isPresent()) {
             throw new UserAlreadyExistsException();
         }
 
+        UUID uuid = UUID.randomUUID();
         this.userRepository.save(UserEntity.builder()
                 .role(UserRole.CLIENT)
-                .uid(UUID.randomUUID())
-                .email(userRequest.getEmail())
-                .password(this.bCryptPasswordEncoder.encode(userRequest.getPassword()))
+                .uid(uuid)
+                .email(login)
+                .activationCode(-1)
+                .password(this.bCryptPasswordEncoder.encode(password))
                 .build());
+
+        return uuid;
+    }
+
+    public void setActivationCode(UUID uid, Integer code) {
+        UserEntity user = this.userRepository.findById(uid)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (user.getActivationCode() == null) {
+            throw new UserAlreadyActivatedAccount();
+        }
+
+        user.setActivationCode(code);
+
+        this.userRepository.save(user);
+    }
+
+    public boolean activateAccount(UUID uid, Integer code) {
+        if (code < 1000 || code > 9999) {
+            throw new RequestNotValidException();
+        }
+
+        UserEntity user = this.userRepository.findById(uid)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (user.getActivationCode().equals(code)) {
+            user.setActivationCode(null);
+            this.userRepository.save(user);
+            return true;
+        } else return false;
     }
 
     public UserEntity getUser(UUID uid) {
