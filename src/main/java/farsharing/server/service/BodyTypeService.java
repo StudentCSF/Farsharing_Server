@@ -17,7 +17,7 @@ public class BodyTypeService {
         this.bodyTypeRepository = bodyTypeRepository;
     }
 
-    private List<BodyTypeEntity> getAllBodyTypes() {
+    public List<BodyTypeEntity> getAllBodyTypes() {
         return this.bodyTypeRepository.findAll();
     }
 }

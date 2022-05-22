@@ -35,7 +35,12 @@ public class CarService {
     private final UpdateCarValidationComponent updateCarValidationComponent;
 
     @Autowired
-    public CarService(CarRepository carRepository, BodyTypeRepository bodyTypeRepository, LocationRepository locationRepository, ColorRepository colorRepository, AddCarValidationComponent addCarValidationComponent, UpdateCarValidationComponent updateCarValidationComponent) {
+    public CarService(CarRepository carRepository,
+                      BodyTypeRepository bodyTypeRepository,
+                      LocationRepository locationRepository,
+                      ColorRepository colorRepository,
+                      AddCarValidationComponent addCarValidationComponent,
+                      UpdateCarValidationComponent updateCarValidationComponent) {
         this.carRepository = carRepository;
         this.bodyTypeRepository = bodyTypeRepository;
         this.locationRepository = locationRepository;
@@ -52,7 +57,8 @@ public class CarService {
         BodyTypeEntity bodyTypeEntity = this.bodyTypeRepository.findById(addCarRequest.getBodyType())
                 .orElseThrow(BodyTypeNotFoundException::new);
 
-        LocationEntity locationEntity = this.locationRepository.findById(addCarRequest.getLocation()).orElse(null);
+        LocationEntity locationEntity = this.locationRepository.findById(addCarRequest.getLocation())
+                .orElse(null);
 
         ColorEntity colorEntity = this.colorRepository.findById(addCarRequest.getColor())
                 .orElseThrow(ColorNotFoundException::new);

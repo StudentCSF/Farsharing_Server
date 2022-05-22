@@ -26,7 +26,9 @@ public class ClientService {
     private final AddClientValidationComponent addClientValidationComponent;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, UserRepository userRepository, AddClientValidationComponent addClientValidationComponent) {
+    public ClientService(ClientRepository clientRepository,
+                         UserRepository userRepository,
+                         AddClientValidationComponent addClientValidationComponent) {
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
         this.addClientValidationComponent = addClientValidationComponent;
