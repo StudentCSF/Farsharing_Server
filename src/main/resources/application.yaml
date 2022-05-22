@@ -1,6 +1,8 @@
-spring.datasource.url=jdbc:postgresql://localhost:5432/fartest
-spring.datasource.username=postgres
-spring.datasource.password=Victor
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fartest
+    username: postgres
+    password: Victor
 #spring.jpa.hibernate.ddl-auto=create-drop
 #spring.jpa.show-sql=true
 #spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
