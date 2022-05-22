@@ -4,6 +4,7 @@ import farsharing.server.component.AddClientValidationComponent;
 
 import farsharing.server.component.MailSenderComponent;
 import farsharing.server.component.StringHandlerComponent;
+import farsharing.server.exception.ClientAlreadyExistsException;
 import farsharing.server.exception.RequestNotValidException;
 import farsharing.server.model.dto.request.AddClientRequest;
 import farsharing.server.model.entity.ClientEntity;
@@ -41,6 +42,10 @@ public class ClientService {
     public void addClient(AddClientRequest addClientRequest) {
         if (!this.addClientValidationComponent.isValid(addClientRequest)) {
             throw new RequestNotValidException();
+        }
+
+        if (this.clientRepository.findByLicense(addClientRequest.getLicense()).isPresent()) {
+            throw new ClientAlreadyExistsException();
         }
 
         UUID userUid = this.userService.addUser(

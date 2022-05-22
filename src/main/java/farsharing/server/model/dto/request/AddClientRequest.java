@@ -10,6 +10,7 @@ import javax.validation.constraints.Pattern;
 @Schema(description = "Сущность для добавления клиентов")
 public class AddClientRequest {
 
+    @NotBlank
     @Pattern(regexp = "^.+@.+$")
     @Schema(description = "Адрес электронной почты")
     private String email;
@@ -40,15 +41,15 @@ public class AddClientRequest {
     @Schema(description = "Номер телефона")
     private String phoneNumber;
 
-    @Pattern(regexp = "^([0-9]{16})?$")
+    @Pattern(regexp = "^[0-9]{16}$")
     @Schema(description = "Номер кредитной карты")
     private String cardNumber;
 
-    @Pattern(regexp = "^((0[1-9]|1[12])/[0-9]{2})?$")
+    @Pattern(regexp = "^(0[1-9]|1[0-2])/[0-9]{2}$")
     @Schema(description = "Срок действия кредитной карты")
     private String validThru;
 
-    @Pattern(regexp = "^([1-9][0-9]{2})?$")
+    @Pattern(regexp = "^[1-9][0-9]{2}$")
     @Schema(description = "CVV-код кредитной карты")
     private String cvv;
 }
