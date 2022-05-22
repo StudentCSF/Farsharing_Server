@@ -21,9 +21,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/api/user")
-    public void registerUser(@RequestBody UserRequest userRequest) {
-        this.userService.addUser(userRequest);
+
+    @GetMapping("/api/user/activate/{uid}/{code}")
+    public boolean activateAccount(
+            @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid,
+            @PathVariable("code") @Parameter(description = "Переданный пользователем код активации") Integer code
+    ) {
+        return this.userService.activateAccount(uid, code);
     }
 
     @GetMapping("/api/user/{uid}")

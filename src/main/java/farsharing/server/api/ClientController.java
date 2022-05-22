@@ -21,9 +21,9 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @PostMapping("/api/client")
+    @PostMapping("/api/client/register")
     public void addClient(@RequestBody AddClientRequest addClientRequest) {
-        //TODO
+        this.clientService.addClient(addClientRequest);
     }
 
     @GetMapping("/api/client/{uid}")
