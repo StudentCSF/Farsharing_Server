@@ -31,4 +31,7 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @Column
+    private Integer activationCode;
 }

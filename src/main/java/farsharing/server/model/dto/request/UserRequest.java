@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
-@Schema(description = "Сущность добавления пользователя")
+@Schema(description = "Сущность авторизации пользователя")
 public class UserRequest {
 
     @Pattern(regexp = "^.+@.+$")
