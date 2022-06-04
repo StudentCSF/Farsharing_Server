@@ -1,7 +1,7 @@
 package farsharing.server.api;
 
 import farsharing.server.model.dto.request.UserRequest;
-import farsharing.server.model.entity.UserEntity;
+import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -59,5 +59,13 @@ public class UserController {
             @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
     ) {
         this.userService.updateUser(userRequest, uid);
+    }
+
+    @PostMapping("/api/user/auth")
+    @Operation(summary = "Авторизация",
+            description = "Позволяет авторизоваться в приложении")
+    public IAuthResponse auth(@RequestBody UserRequest userRequest)
+    {
+        return this.userService.auth(userRequest);
     }
 }

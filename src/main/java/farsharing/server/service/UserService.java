@@ -3,10 +3,15 @@ package farsharing.server.service;
 import farsharing.server.component.UserRequestValidationComponent;
 import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.UserRequest;
+import farsharing.server.model.dto.response.AuthAdminResponse;
+import farsharing.server.model.dto.response.AuthClientResponse;
+import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.model.entity.UserEntity;
+import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.model.entity.enumerate.UserRole;
+import farsharing.server.repository.CarRepository;
+import farsharing.server.repository.ContractRepository;
 import farsharing.server.repository.UserRepository;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,13 +27,21 @@ public class UserService {
 
     private final UserRequestValidationComponent userRequestValidationComponent;
 
+    private final CarRepository carRepository;
+
+    private final ContractRepository contractRepository;
+
     @Autowired
     public UserService(UserRepository userRepository,
                        BCryptPasswordEncoder bCryptPasswordEncoder,
-                       UserRequestValidationComponent userRequestValidationComponent) {
+                       UserRequestValidationComponent userRequestValidationComponent,
+                       CarRepository carRepository,
+                       ContractRepository contractRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRequestValidationComponent = userRequestValidationComponent;
+        this.carRepository = carRepository;
+        this.contractRepository = contractRepository;
     }
 
     public UUID addUser(String login, String password) {
@@ -103,5 +116,30 @@ public class UserService {
         userEntity.setEmail(userRequest.getEmail());
 
         userEntity.setPassword(userRequest.getPassword());
+    }
+
+    public IAuthResponse auth(UserRequest userRequest) {
+        if (!this.userRequestValidationComponent.isValid(userRequest)) {
+            throw new RequestNotValidException();
+        }
+
+        UserEntity user = this.userRepository.findByEmail(userRequest.getEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!this.bCryptPasswordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
+            throw new WrongPasswordException();
+        }
+
+        if (user.getRole() == UserRole.ADMIN) {
+            return AuthAdminResponse.builder()
+                    .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
+                    .build();
+        } else if (user.getRole() == UserRole.CLIENT && user.getActivationCode() == null) {
+            return AuthClientResponse.builder()
+                    .cars(this.carRepository.findAll())
+                    .build();
+        } else {
+            return null;
+        }
     }
 }
