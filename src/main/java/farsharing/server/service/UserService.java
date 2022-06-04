@@ -136,22 +136,31 @@ public class UserService {
             throw new WrongPasswordException();
         }
 
+        AuthAdminResponse aa;
+        AuthClientResponse ac;
+
         if (user.getRole() == UserRole.ADMIN) {
-            return AuthAdminResponse.builder()
+             aa = AuthAdminResponse.builder()
                     .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
                     .build();
+             ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
             if (user.getActivationCode() != null) {
                 throw new NotConfirmedAccountException();
             }
-            return AuthClientResponse.builder()
+            ac =  AuthClientResponse.builder()
                     .uid(this.clientRepository.findByUserUid(user.getUid())
                             .orElseThrow(ClientNotFoundException::new)
                             .getUid())
                     .cars(this.carRepository.findAll())
                     .build();
+            aa = null;
         } else {
             return null;
         }
+        return IAuthResponse.builder()
+                .authAdminResponse(aa)
+                .authClientResponse(ac)
+                .build();
     }
 }
