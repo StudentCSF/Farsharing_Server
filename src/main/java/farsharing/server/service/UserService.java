@@ -134,7 +134,10 @@ public class UserService {
             return AuthAdminResponse.builder()
                     .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
                     .build();
-        } else if (user.getRole() == UserRole.CLIENT && user.getActivationCode() == null) {
+        } else if (user.getRole() == UserRole.CLIENT) {
+            if (user.getActivationCode() != null) {
+                throw new NotConfirmedAccountException();
+            }
             return AuthClientResponse.builder()
                     .cars(this.carRepository.findAll())
                     .build();
