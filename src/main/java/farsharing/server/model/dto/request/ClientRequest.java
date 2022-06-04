@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 
 @Data
 @Schema(description = "Сущность для добавления клиентов")
-public class AddClientRequest {
+public class ClientRequest {
 
     @NotBlank
     @Pattern(regexp = "^.+@.+$")

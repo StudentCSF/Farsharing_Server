@@ -1,7 +1,7 @@
 package farsharing.server.api;
 
 import farsharing.server.model.dto.request.UserRequest;
-import farsharing.server.model.entity.UserEntity;
+import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,15 +42,6 @@ public class UserController {
 //        return this.userService.getUser(uid);
 //    }
 
-    @DeleteMapping("/api/user/{uid}")
-    @Operation(summary = "Удаление пользователя",
-            description = "Позволяет перманентно деактивировать учетную запись")
-    public void deleteUser(
-            @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
-    ) {
-        this.userService.deleteUser(uid);
-    }
-
     @PutMapping("/api/user/{uid}")
     @Operation(summary = "Обновление учетных данных пользователя",
             description = "Позволяет обновить учетные данные пользователя")
@@ -59,5 +50,13 @@ public class UserController {
             @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
     ) {
         this.userService.updateUser(userRequest, uid);
+    }
+
+    @PostMapping("/api/user/auth")
+    @Operation(summary = "Авторизация",
+            description = "Позволяет авторизоваться в приложении")
+    public IAuthResponse auth(@RequestBody UserRequest userRequest)
+    {
+        return this.userService.auth(userRequest);
     }
 }
