@@ -33,4 +33,6 @@ public class ClientDataResponse {
     private Integer accidents;
 
     private ClientStatus status;
+
+    private Boolean existsActiveContract;
 }

@@ -13,7 +13,9 @@ import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.model.entity.enumerate.ClientStatus;
+import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.repository.ClientRepository;
+import farsharing.server.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,17 +35,21 @@ public class ClientService {
 
     private final MailSenderComponent mailSenderComponent;
 
+    private final ContractRepository contractRepository;
+
     @Autowired
     public ClientService(ClientRepository clientRepository,
                          UserService userService,
                          ClientRequestValidationComponent clientRequestValidationComponent,
                          StringHandlerComponent stringHandlerComponent,
-                         MailSenderComponent mailSenderComponent) {
+                         MailSenderComponent mailSenderComponent,
+                         ContractRepository contractRepository) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.clientRequestValidationComponent = clientRequestValidationComponent;
         this.stringHandlerComponent = stringHandlerComponent;
         this.mailSenderComponent = mailSenderComponent;
+        this.contractRepository = contractRepository;
     }
 
     public void addClient(ClientRequest clientRequest) {
@@ -95,6 +101,9 @@ public class ClientService {
 
         WalletEmbeddable wallet = client.getWallet();
 
+        Boolean existsContract = !this.contractRepository.findAllByClientUidAndStatus(uid, ContractStatus.ACTIVE)
+                .isEmpty();
+
         ClientDataResponse res = ClientDataResponse.builder()
                 .accidents(client.getAccidents())
                 .address(client.getAddress())
@@ -106,6 +115,7 @@ public class ClientService {
                 .midName(client.getMidName())
                 .password(user.getPassword())
                 .phoneNumber(client.getPhoneNumber())
+                .existsActiveContract(existsContract)
                 .build();
 
         if (wallet != null) {

@@ -18,4 +18,6 @@ public interface ContractRepository extends JpaRepository<ContractEntity, UUID> 
     @Query(nativeQuery = true,
             value = "select * from contract where car_uid=:uid order by start_time desc;")
     List<ContractEntity> findByCar(UUID uid);
+
+    List<ContractEntity> findAllByClientUidAndStatus(UUID uid, ContractStatus status);
 }
