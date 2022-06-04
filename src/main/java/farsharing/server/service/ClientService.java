@@ -5,9 +5,12 @@ import farsharing.server.component.AddClientValidationComponent;
 import farsharing.server.component.MailSenderComponent;
 import farsharing.server.component.StringHandlerComponent;
 import farsharing.server.exception.ClientAlreadyExistsException;
+import farsharing.server.exception.ClientNotFoundException;
 import farsharing.server.exception.RequestNotValidException;
 import farsharing.server.model.dto.request.AddClientRequest;
+import farsharing.server.model.dto.response.ClientDataResponse;
 import farsharing.server.model.entity.ClientEntity;
+import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.model.entity.enumerate.ClientStatus;
 import farsharing.server.repository.ClientRepository;
@@ -78,5 +81,35 @@ public class ClientService {
         int code = this.mailSenderComponent.sendActivationCode(addClientRequest.getEmail());
 
         this.userService.setActivationCode(userUid, code);
+    }
+
+    public ClientDataResponse getData(UUID uid) {
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
+
+        UserEntity user = this.userService.getUser(client.getUser().getUid());
+
+        WalletEmbeddable wallet = client.getWallet();
+
+        ClientDataResponse res =  ClientDataResponse.builder()
+                .accidents(client.getAccidents())
+                .address(client.getAddress())
+                .status(client.getStatus())
+                .email(user.getEmail())
+                .firstName(client.getFirstName())
+                .lastName(client.getLastName())
+                .license(client.getLicense())
+                .midName(client.getMidName())
+                .password(user.getPassword())
+                .phoneNumber(client.getPhoneNumber())
+                .build();
+
+        if (wallet != null) {
+            res.setCardNumber(wallet.getCard());
+            res.setCvv(wallet.getCvv() + "");
+            res.setValidThru(wallet.getValidThru());
+        }
+
+        return res;
     }
 }
