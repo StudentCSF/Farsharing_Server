@@ -1,8 +1,7 @@
 package farsharing.server.api;
 
-import farsharing.server.model.dto.request.AddClientRequest;
+import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
-import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,8 +25,8 @@ public class ClientController {
     @PostMapping("/api/client/register")
     @Operation(summary = "Регистрация клиента",
             description = "Позволяет зарегистрировать клиента")
-    public void addClient(@RequestBody AddClientRequest addClientRequest) {
-        this.clientService.addClient(addClientRequest);
+    public void addClient(@RequestBody ClientRequest clientRequest) {
+        this.clientService.addClient(clientRequest);
     }
 
 //    @GetMapping("/api/client/{uid}")
@@ -49,13 +48,13 @@ public class ClientController {
         this.clientService.delete(uid);
     }
 
-    @PutMapping("/api/client/{uid}")
+    @PutMapping("/api/client/{client_uid}")
     @Operation(summary = "Обновление данных клиента",
             description = "Позволяет обновить данные о клиенте")
-    public void updateClient(@RequestBody AddClientRequest addClientRequest,
-                             @PathVariable("uid") @Parameter(description = "Идентификатор клиента") UUID uid
+    public void updateClient(@RequestBody ClientRequest clientRequest,
+                             @PathVariable("client_uid") @Parameter(description = "Идентификатор клиента") UUID uid
     ) {
-        //TODO
+        this.clientService.update(uid, clientRequest);
     }
 
     @GetMapping("/api/client/{client_uid}")

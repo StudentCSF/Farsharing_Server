@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -111,16 +112,16 @@ public class UserService {
         UserEntity userEntity = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
 
-        UserEntity userEntity2 = this.userRepository.findByEmail(userRequest.getEmail())
-                .orElse(null);
-
-        if (userEntity2 != null) {
+        Optional<UserEntity> u2 = this.userRepository.findByEmail(userRequest.getEmail());
+        if (u2.isPresent() && !u2.get().getUid().equals(uid)) {
             throw new SuchEmailAlreadyExistException();
         }
 
         userEntity.setEmail(userRequest.getEmail());
 
-        userEntity.setPassword(userRequest.getPassword());
+        userEntity.setPassword(this.bCryptPasswordEncoder.encode(userRequest.getPassword()));
+
+        this.userRepository.save(userEntity);
     }
 
     public IAuthResponse auth(UserRequest userRequest) {

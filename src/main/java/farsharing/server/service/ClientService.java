@@ -1,13 +1,13 @@
 package farsharing.server.service;
 
-import farsharing.server.component.AddClientValidationComponent;
-
+import farsharing.server.component.ClientRequestValidationComponent;
 import farsharing.server.component.MailSenderComponent;
 import farsharing.server.component.StringHandlerComponent;
 import farsharing.server.exception.ClientAlreadyExistsException;
 import farsharing.server.exception.ClientNotFoundException;
 import farsharing.server.exception.RequestNotValidException;
-import farsharing.server.model.dto.request.AddClientRequest;
+import farsharing.server.model.dto.request.ClientRequest;
+import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.UserEntity;
@@ -17,6 +17,7 @@ import farsharing.server.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,7 +27,7 @@ public class ClientService {
 
     private final UserService userService;
 
-    private final AddClientValidationComponent addClientValidationComponent;
+    private final ClientRequestValidationComponent clientRequestValidationComponent;
 
     private final StringHandlerComponent stringHandlerComponent;
 
@@ -34,34 +35,37 @@ public class ClientService {
 
     @Autowired
     public ClientService(ClientRepository clientRepository,
-                         UserService userService, AddClientValidationComponent addClientValidationComponent, StringHandlerComponent stringHandlerComponent, MailSenderComponent mailSenderComponent) {
+                         UserService userService,
+                         ClientRequestValidationComponent clientRequestValidationComponent,
+                         StringHandlerComponent stringHandlerComponent,
+                         MailSenderComponent mailSenderComponent) {
         this.clientRepository = clientRepository;
         this.userService = userService;
-        this.addClientValidationComponent = addClientValidationComponent;
+        this.clientRequestValidationComponent = clientRequestValidationComponent;
         this.stringHandlerComponent = stringHandlerComponent;
         this.mailSenderComponent = mailSenderComponent;
     }
 
-    public void addClient(AddClientRequest addClientRequest) {
-        if (!this.addClientValidationComponent.isValid(addClientRequest)) {
+    public void addClient(ClientRequest clientRequest) {
+        if (!this.clientRequestValidationComponent.isValid(clientRequest)) {
             throw new RequestNotValidException();
         }
 
-        if (this.clientRepository.findByLicense(addClientRequest.getLicense()).isPresent()) {
+        if (this.clientRepository.findByLicense(clientRequest.getLicense()).isPresent()) {
             throw new ClientAlreadyExistsException();
         }
 
         UUID userUid = this.userService.addUser(
-                addClientRequest.getEmail(),
-                addClientRequest.getPassword()
+                clientRequest.getEmail(),
+                clientRequest.getPassword()
         );
 
-        String cvv = this.stringHandlerComponent.emptyLikeNull(addClientRequest.getCvv());
+        String cvv = this.stringHandlerComponent.emptyLikeNull(clientRequest.getCvv());
 
         WalletEmbeddable wallet = WalletEmbeddable.builder()
-                .card(this.stringHandlerComponent.emptyLikeNull(addClientRequest.getCardNumber()))
+                .card(this.stringHandlerComponent.emptyLikeNull(clientRequest.getCardNumber()))
                 .cvv(cvv == null ? null : Integer.valueOf(cvv))
-                .validThru(this.stringHandlerComponent.emptyLikeNull(addClientRequest.getValidThru()))
+                .validThru(this.stringHandlerComponent.emptyLikeNull(clientRequest.getValidThru()))
                 .build();
 
         this.clientRepository.save(ClientEntity.builder()
@@ -69,16 +73,16 @@ public class ClientService {
                 .wallet(wallet)
                 .uid(UUID.randomUUID())
                 .status(ClientStatus.DEFAULT)
-                .phoneNumber(addClientRequest.getPhoneNumber())
-                .midName(this.stringHandlerComponent.emptyLikeNull(addClientRequest.getMidName()))
-                .license(addClientRequest.getLicense())
+                .phoneNumber(clientRequest.getPhoneNumber())
+                .midName(this.stringHandlerComponent.emptyLikeNull(clientRequest.getMidName()))
+                .license(clientRequest.getLicense())
                 .accidents(0)
-                .address(this.stringHandlerComponent.emptyLikeNull(addClientRequest.getAddress()))
-                .firstName(addClientRequest.getFirstName())
-                .lastName(addClientRequest.getLastName())
+                .address(this.stringHandlerComponent.emptyLikeNull(clientRequest.getAddress()))
+                .firstName(clientRequest.getFirstName())
+                .lastName(clientRequest.getLastName())
                 .build());
 
-        int code = this.mailSenderComponent.sendActivationCode(addClientRequest.getEmail());
+        int code = this.mailSenderComponent.sendActivationCode(clientRequest.getEmail());
 
         this.userService.setActivationCode(userUid, code);
     }
@@ -117,5 +121,42 @@ public class ClientService {
         this.userService.deleteUser(this.clientRepository.findById(uid)
                 .orElseThrow(ClientNotFoundException::new)
                 .getUser().getUid());
+    }
+
+    public void update(UUID uid, ClientRequest clientRequest) {
+        if (!this.clientRequestValidationComponent.isValid(clientRequest)) {
+            throw new RequestNotValidException();
+        }
+
+        Optional<ClientEntity> otherClient = this.clientRepository.findByLicense(clientRequest.getLicense());
+        if (otherClient.isPresent() && !otherClient.get().getUid().equals(uid)) {
+            throw new ClientAlreadyExistsException();
+        }
+
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
+
+        UserRequest userRequest = new UserRequest();
+        userRequest.setEmail(clientRequest.getEmail());
+        userRequest.setPassword(clientRequest.getPassword());
+
+        this.userService.updateUser(userRequest, client.getUser().getUid());
+
+        String cvv = this.stringHandlerComponent.emptyLikeNull(clientRequest.getCvv());
+        WalletEmbeddable wallet = WalletEmbeddable.builder()
+                .card(this.stringHandlerComponent.emptyLikeNull(clientRequest.getCardNumber()))
+                .cvv(cvv == null ? null : Integer.valueOf(cvv))
+                .validThru(this.stringHandlerComponent.emptyLikeNull(clientRequest.getValidThru()))
+                .build();
+
+        client.setAddress(this.stringHandlerComponent.emptyLikeNull(clientRequest.getAddress()));
+        client.setFirstName(clientRequest.getFirstName());
+        client.setLastName(clientRequest.getLastName());
+        client.setLicense(clientRequest.getLicense());
+        client.setPhoneNumber(clientRequest.getPhoneNumber());
+        client.setMidName(this.stringHandlerComponent.emptyLikeNull(clientRequest.getMidName()));
+        client.setWallet(wallet);
+
+        this.clientRepository.save(client);
     }
 }
