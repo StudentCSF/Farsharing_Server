@@ -10,6 +10,7 @@ import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.CarRepository;
+import farsharing.server.repository.ClientRepository;
 import farsharing.server.repository.ContractRepository;
 import farsharing.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,21 @@ public class UserService {
 
     private final ContractRepository contractRepository;
 
+    private final ClientRepository clientRepository;
+
     @Autowired
     public UserService(UserRepository userRepository,
                        BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserRequestValidationComponent userRequestValidationComponent,
                        CarRepository carRepository,
-                       ContractRepository contractRepository) {
+                       ContractRepository contractRepository,
+                       ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRequestValidationComponent = userRequestValidationComponent;
         this.carRepository = carRepository;
         this.contractRepository = contractRepository;
+        this.clientRepository = clientRepository;
     }
 
     public UUID addUser(String login, String password) {
@@ -139,6 +144,9 @@ public class UserService {
                 throw new NotConfirmedAccountException();
             }
             return AuthClientResponse.builder()
+                    .uid(this.clientRepository.findByUserUid(user.getUid())
+                            .orElseThrow(ClientNotFoundException::new)
+                            .getUid())
                     .cars(this.carRepository.findAll())
                     .build();
         } else {
