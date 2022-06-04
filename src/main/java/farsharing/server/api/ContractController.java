@@ -1,6 +1,7 @@
 package farsharing.server.api;
 
 import farsharing.server.model.dto.response.CarResponse;
+import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.service.ContractService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,5 +34,16 @@ public class ContractController {
             @PathVariable(name = "car_uid") @Parameter(description = "Идентификатор машины") UUID carUid
     ) {
         return this.contractService.checkCar(clUid, carUid);
+    }
+
+
+
+    @GetMapping("/api/pay/{client_uid}")
+    @Operation(summary = "Получение платежных данных",
+            description = "Позволяет получить платежные данные клиента, желавшего оплатить бронь")
+    public WalletEmbeddable getPayData(
+            @PathVariable(value = "client_uid") @Parameter(description = "Идентификатор клиент") UUID uid
+    ) {
+        return this.contractService.getPayData(uid);
     }
 }
