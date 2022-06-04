@@ -1,5 +1,6 @@
 package farsharing.server.api;
 
+import farsharing.server.model.dto.request.PayRequest;
 import farsharing.server.model.dto.response.CarResponse;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.service.ContractService;
@@ -7,17 +8,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @Tag(name = "Контроллер контрактов", description = "Позволяет добавлять контракты и изменять их состояние")
 public class ContractController {
-
-    //TODO ContractService, DTOs
 
     private final ContractService contractService;
 
@@ -37,7 +34,6 @@ public class ContractController {
     }
 
 
-
     @GetMapping("/api/pay/{client_uid}")
     @Operation(summary = "Получение платежных данных",
             description = "Позволяет получить платежные данные клиента, желавшего оплатить бронь")
@@ -45,5 +41,14 @@ public class ContractController {
             @PathVariable(value = "client_uid") @Parameter(description = "Идентификатор клиент") UUID uid
     ) {
         return this.contractService.getPayData(uid);
+    }
+
+    @PutMapping("/api/pay/{contract_uid}")
+    @Operation(summary = "Оплата брони",
+            description = "Позволяет провести оплату брони")
+    public void pay(
+            @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid,
+            @RequestBody PayRequest request) {
+        this.contractService.pay(uid, request);
     }
 }

@@ -4,6 +4,8 @@ import farsharing.server.model.entity.enumerate.ContractStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 @Builder
 public class CarResponse {
@@ -13,4 +15,6 @@ public class CarResponse {
     private Boolean thisClient;
 
     private ContractStatus status;
+
+    private UUID contractUid;
 }
