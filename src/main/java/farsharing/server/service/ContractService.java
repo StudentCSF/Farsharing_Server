@@ -1,9 +1,12 @@
 package farsharing.server.service;
 
+import farsharing.server.component.AddContractRequestValidationComponent;
 import farsharing.server.component.PayRequestValidationComponent;
 import farsharing.server.exception.*;
+import farsharing.server.model.dto.request.AddContractRequest;
 import farsharing.server.model.dto.request.PayRequest;
 import farsharing.server.model.dto.response.CarResponse;
+import farsharing.server.model.entity.CarEntity;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.ContractEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
@@ -28,15 +31,19 @@ public class ContractService {
 
     private final PayRequestValidationComponent payRequestValidationComponent;
 
+    private final AddContractRequestValidationComponent addContractRequestValidationComponent;
+
     @Autowired
     public ContractService(ContractRepository contractRepository,
                            CarRepository carRepository,
                            ClientRepository clientRepository,
-                           PayRequestValidationComponent payRequestValidationComponent) {
+                           PayRequestValidationComponent payRequestValidationComponent,
+                           AddContractRequestValidationComponent addContractRequestValidationComponent) {
         this.contractRepository = contractRepository;
         this.carRepository = carRepository;
         this.clientRepository = clientRepository;
         this.payRequestValidationComponent = payRequestValidationComponent;
+        this.addContractRequestValidationComponent = addContractRequestValidationComponent;
     }
 
     public CarResponse checkCar(UUID clUid, UUID carUid) {
@@ -120,7 +127,53 @@ public class ContractService {
 
         // Вместо реальной ветки оплаты тут ничего не происходит
 
+        CarEntity car = this.carRepository.findById(contract.getCar().getUid())
+                .orElseThrow(CarNotFoundException::new);
+
+        car.setIsAvailable(false);
+        this.carRepository.save(car);
+
         contract.setStatus(ContractStatus.ACTIVE);
         this.contractRepository.save(contract);
+    }
+
+    public void cancel(UUID uid) {
+        ContractEntity contract = this.contractRepository.findById(uid)
+                .orElseThrow(ContractNotFoundException::new);
+
+        if (contract.getStatus() == ContractStatus.CONSIDERED
+                || contract.getStatus() == ContractStatus.APPROVED
+        ) {
+            contract.setStatus(ContractStatus.CLOSED);
+
+            this.contractRepository.save(contract);
+        }
+    }
+
+    public UUID addContract(AddContractRequest addContractRequest) {
+        if (!this.addContractRequestValidationComponent.isValid(addContractRequest)) {
+            throw new RequestNotValidException();
+        }
+
+        CarEntity car = this.carRepository.findById(addContractRequest.getCarUid())
+                .orElseThrow(CarNotFoundException::new);
+
+        if (!car.getIsAvailable()) {
+            throw new CarIsNotAvailableException();
+        }
+
+        UUID res = UUID.randomUUID();
+        this.contractRepository.save(ContractEntity.builder()
+                .uid(res)
+                .car(car)
+                .status(ContractStatus.CONSIDERED)
+                .startTime(addContractRequest.getStartTime())
+                .endTime(addContractRequest.getEndTime())
+                .client(this.clientRepository.findById(
+                                addContractRequest.getClientUid())
+                        .orElseThrow(ClientNotFoundException::new))
+                .build());
+
+        return res;
     }
 }

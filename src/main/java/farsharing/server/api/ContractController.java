@@ -1,5 +1,6 @@
 package farsharing.server.api;
 
+import farsharing.server.model.dto.request.AddContractRequest;
 import farsharing.server.model.dto.request.PayRequest;
 import farsharing.server.model.dto.response.CarResponse;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
@@ -50,5 +51,21 @@ public class ContractController {
             @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid,
             @RequestBody PayRequest request) {
         this.contractService.pay(uid, request);
+    }
+
+    @GetMapping("/api/contract/cancel/{contract_uid}")
+    @Operation(summary = "Отмена брони",
+            description = "Позволяет отменить бронь")
+    public void cancel(
+            @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid
+    ) {
+        this.contractService.cancel(uid);
+    }
+
+    @PostMapping("api/contract/new")
+    @Operation(summary = "Заявка на бронь",
+            description = "Позволяет оформить заявку на бронь")
+    public UUID request(@RequestBody AddContractRequest addContractRequest) {
+        return this.contractService.addContract(addContractRequest);
     }
 }
