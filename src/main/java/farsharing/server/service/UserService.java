@@ -10,12 +10,14 @@ import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.CarRepository;
+import farsharing.server.repository.ClientRepository;
 import farsharing.server.repository.ContractRepository;
 import farsharing.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,17 +33,21 @@ public class UserService {
 
     private final ContractRepository contractRepository;
 
+    private final ClientRepository clientRepository;
+
     @Autowired
     public UserService(UserRepository userRepository,
                        BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserRequestValidationComponent userRequestValidationComponent,
                        CarRepository carRepository,
-                       ContractRepository contractRepository) {
+                       ContractRepository contractRepository,
+                       ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRequestValidationComponent = userRequestValidationComponent;
         this.carRepository = carRepository;
         this.contractRepository = contractRepository;
+        this.clientRepository = clientRepository;
     }
 
     public UUID addUser(String login, String password) {
@@ -98,7 +104,7 @@ public class UserService {
         UserEntity user = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
         user.setRole(UserRole.DELETED);
-        user.setEmail(this.bCryptPasswordEncoder.encode(user.getEmail()));
+        //user.setEmail(this.bCryptPasswordEncoder.encode(user.getEmail()));
         this.userRepository.save(user);
     }
 
@@ -106,16 +112,16 @@ public class UserService {
         UserEntity userEntity = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
 
-        UserEntity userEntity2 = this.userRepository.findByEmail(userRequest.getEmail())
-                .orElse(null);
-
-        if (userEntity2 != null) {
+        Optional<UserEntity> u2 = this.userRepository.findByEmail(userRequest.getEmail());
+        if (u2.isPresent() && !u2.get().getUid().equals(uid)) {
             throw new SuchEmailAlreadyExistException();
         }
 
         userEntity.setEmail(userRequest.getEmail());
 
-        userEntity.setPassword(userRequest.getPassword());
+        userEntity.setPassword(this.bCryptPasswordEncoder.encode(userRequest.getPassword()));
+
+        this.userRepository.save(userEntity);
     }
 
     public IAuthResponse auth(UserRequest userRequest) {
@@ -130,19 +136,31 @@ public class UserService {
             throw new WrongPasswordException();
         }
 
+        AuthAdminResponse aa;
+        AuthClientResponse ac;
+
         if (user.getRole() == UserRole.ADMIN) {
-            return AuthAdminResponse.builder()
+             aa = AuthAdminResponse.builder()
                     .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
                     .build();
+             ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
             if (user.getActivationCode() != null) {
                 throw new NotConfirmedAccountException();
             }
-            return AuthClientResponse.builder()
+            ac =  AuthClientResponse.builder()
+                    .uid(this.clientRepository.findByUserUid(user.getUid())
+                            .orElseThrow(ClientNotFoundException::new)
+                            .getUid())
                     .cars(this.carRepository.findAll())
                     .build();
+            aa = null;
         } else {
             return null;
         }
+        return IAuthResponse.builder()
+                .authAdminResponse(aa)
+                .authClientResponse(ac)
+                .build();
     }
 }

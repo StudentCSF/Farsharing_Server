@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface ClientRepository extends JpaRepository<ClientEntity, UUID> {
 
     Optional<ClientEntity> findByLicense(String license);
+
+    Optional<ClientEntity> findByUserUid(UUID uid);
 }
