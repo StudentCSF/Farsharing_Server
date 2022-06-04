@@ -42,15 +42,6 @@ public class UserController {
 //        return this.userService.getUser(uid);
 //    }
 
-    @DeleteMapping("/api/user/{uid}")
-    @Operation(summary = "Удаление пользователя",
-            description = "Позволяет перманентно деактивировать учетную запись")
-    public void deleteUser(
-            @PathVariable("uid") @Parameter(description = "Идентификатор пользователя") UUID uid
-    ) {
-        this.userService.deleteUser(uid);
-    }
-
     @PutMapping("/api/user/{uid}")
     @Operation(summary = "Обновление учетных данных пользователя",
             description = "Позволяет обновить учетные данные пользователя")

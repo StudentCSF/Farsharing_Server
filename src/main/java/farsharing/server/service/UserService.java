@@ -103,7 +103,7 @@ public class UserService {
         UserEntity user = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
         user.setRole(UserRole.DELETED);
-        user.setEmail(this.bCryptPasswordEncoder.encode(user.getEmail()));
+        //user.setEmail(this.bCryptPasswordEncoder.encode(user.getEmail()));
         this.userRepository.save(user);
     }
 

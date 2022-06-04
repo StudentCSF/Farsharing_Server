@@ -40,13 +40,13 @@ public class ClientController {
 //        return null;
 //    }
 
-    @DeleteMapping("/api/client/{uid}")
+    @DeleteMapping("/api/client/delete/{client_uid}")
     @Operation(summary = "Удаление клиента",
-            description = "Позволяет удалить личные данные о клиенте")
-    public void deleteClient(
-            @PathVariable("uid") @Parameter(description = "Идентификатор клиента") UUID uid
+            description = "Позволяет деактивировать учетную запись клиента")
+    public void delete(
+            @PathVariable("client_uid") @Parameter(description = "Идентификатор клиента") UUID uid
     ) {
-        //TODO
+        this.clientService.delete(uid);
     }
 
     @PutMapping("/api/client/{uid}")

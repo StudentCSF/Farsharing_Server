@@ -91,7 +91,7 @@ public class ClientService {
 
         WalletEmbeddable wallet = client.getWallet();
 
-        ClientDataResponse res =  ClientDataResponse.builder()
+        ClientDataResponse res = ClientDataResponse.builder()
                 .accidents(client.getAccidents())
                 .address(client.getAddress())
                 .status(client.getStatus())
@@ -111,5 +111,11 @@ public class ClientService {
         }
 
         return res;
+    }
+
+    public void delete(UUID uid) {
+        this.userService.deleteUser(this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new)
+                .getUser().getUid());
     }
 }
