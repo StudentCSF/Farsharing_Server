@@ -28,7 +28,8 @@ public class AddCarRequest {
     @Schema(description = "Название типа кузова")
     private String bodyType;
 
-    @Schema(description = "Идентификатор местоположения, если оно известно")
+    @NotNull
+    @Schema(description = "Идентификатор местоположения")
     private UUID location;
 
     @NotBlank

@@ -53,6 +53,10 @@ public class ContractService {
             throw new RequestNotValidException();
         }
 
+        if (this.clientRepository.findById(clUid).isEmpty()) {
+            throw new ClientNotFoundException();
+        }
+
         boolean isFree = this.carRepository.findById(carUid)
                 .orElseThrow(CarNotFoundException::new)
                 .getIsAvailable();
@@ -95,7 +99,10 @@ public class ContractService {
     }
 
     public void pay(UUID uid, PayRequest request) {
-        if (!this.payRequestValidationComponent.isValid(request) || uid == null) {
+        if (request == null
+                || !this.payRequestValidationComponent.isValid(request)
+                || uid == null
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -140,6 +147,9 @@ public class ContractService {
     }
 
     public void cancel(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         ContractEntity contract = this.contractRepository.findById(uid)
                 .orElseThrow(ContractNotFoundException::new);
 
@@ -153,7 +163,9 @@ public class ContractService {
     }
 
     public UUID addContract(AddContractRequest addContractRequest) {
-        if (!this.addContractRequestValidationComponent.isValid(addContractRequest)) {
+        if (addContractRequest == null
+                || !this.addContractRequestValidationComponent.isValid(addContractRequest)
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -187,7 +199,7 @@ public class ContractService {
         ContractEntity contract = this.contractRepository.findById(uid)
                 .orElseThrow(ContractNotFoundException::new);
         if (contract.getStatus() != ContractStatus.CONSIDERED) {
-            throw new ContractAlreadyActiveException();
+            throw new ContractHaveNotConsideredStatusException();
         }
         ClientEntity client = this.clientRepository.findById(contract.getClient().getUid())
                 .orElseThrow(ClientNotFoundException::new);
@@ -203,7 +215,7 @@ public class ContractService {
     }
 
     public void approve(UUID uid, Boolean approve) {
-        if (uid == null) {
+        if (uid == null || approve == null) {
             throw new RequestNotValidException();
         }
 

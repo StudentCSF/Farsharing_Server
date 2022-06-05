@@ -50,20 +50,26 @@ public class CarService {
     }
 
     public void addCar(AddCarRequest addCarRequest) {
-        if (!addCarValidationComponent.isValid(addCarRequest)) {
+        if (addCarRequest == null
+                || !addCarValidationComponent.isValid(addCarRequest)
+        ) {
             throw new RequestNotValidException();
+        }
+
+        if (this.carRepository.findByStateNumber(addCarRequest.getStateNumber()).isPresent()) {
+            throw new CarWithSuchStateNumberAlreadyExistsException();
         }
 
         BodyTypeEntity bodyTypeEntity = this.bodyTypeRepository.findById(addCarRequest.getBodyType())
                 .orElseThrow(BodyTypeNotFoundException::new);
 
         LocationEntity locationEntity = this.locationRepository.findById(addCarRequest.getLocation())
-                .orElse(null);
+                .orElseThrow(LocationNotFoundException::new);
 
         ColorEntity colorEntity = this.colorRepository.findById(addCarRequest.getColor())
                 .orElseThrow(ColorNotFoundException::new);
 
-        this.carRepository.save(CarEntity.builder()
+        CarEntity newCar = CarEntity.builder()
                 .bodyType(bodyTypeEntity)
                 .brand(addCarRequest.getBrand())
                 .color(colorEntity)
@@ -74,10 +80,15 @@ public class CarService {
                 .pricePerHour(addCarRequest.getPricePerHour())
                 .stateNumber(addCarRequest.getStateNumber())
                 .uid(UUID.randomUUID())
-                .build());
+                .build();
+
+        this.carRepository.save(newCar);
     }
 
     public CarEntity getCar(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         return this.carRepository.findById(uid)
                 .orElseThrow(CarNotFoundException::new);
     }
@@ -87,11 +98,17 @@ public class CarService {
     }
 
     public void removeCar(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         this.carRepository.deleteById(uid);
     }
 
     public void updateCar(UpdateCarRequest updateCarRequest, UUID uid) {
-        if (!this.updateCarValidationComponent.isValid(updateCarRequest)) {
+        if (uid == null
+                || updateCarRequest == null
+                || !this.updateCarValidationComponent.isValid(updateCarRequest)
+        ) {
             throw new RequestNotValidException();
         }
         CarEntity carEntity = this.carRepository.findById(uid)
@@ -107,8 +124,9 @@ public class CarService {
         carEntity.setColor(this.colorRepository.findById(updateCarRequest.getColor())
                 .orElseThrow(ColorNotFoundException::new));
 
+
         carEntity.setLocation(this.locationRepository.findById(updateCarRequest.getLocation())
-                .orElse(null));
+                .orElseThrow(LocationNotFoundException::new));
 
         carEntity.setMileage(updateCarRequest.getMileage());
 
