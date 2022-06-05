@@ -28,6 +28,7 @@ public class UpdateCarRequest {
     @Schema(description = "Новое название типа кузова")
     private String bodyType;
 
+    @NotNull
     @Schema(description = "Идентификатор нового местоположения")
     private UUID location;
 
