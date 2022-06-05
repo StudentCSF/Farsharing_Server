@@ -19,6 +19,7 @@ import farsharing.server.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -168,5 +169,23 @@ public class ClientService {
         client.setWallet(wallet);
 
         this.clientRepository.save(client);
+    }
+
+    public void changeClientStatus(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
+
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
+
+        boolean bnd = client.getStatus() == ClientStatus.BANNED;
+        client.setStatus(bnd ? ClientStatus.DEFAULT : ClientStatus.BANNED);
+
+        this.clientRepository.save(client);
+    }
+
+    public List<ClientEntity> getAll() {
+        return this.clientRepository.findAll();
     }
 }
