@@ -201,4 +201,21 @@ public class ContractService {
                 .client(client)
                 .build();
     }
+
+    public void approve(UUID uid, Boolean approve) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
+
+         ContractEntity contract = this.contractRepository.findById(uid)
+                 .orElseThrow(ContractNotFoundException::new);
+
+        if (contract.getStatus() != ContractStatus.CONSIDERED) {
+            throw new ContractHaveNotConsideredStatusException();
+        }
+
+        contract.setStatus(approve ? ContractStatus.APPROVED : ContractStatus.REJECTED);
+
+        this.contractRepository.save(contract);
+    }
 }

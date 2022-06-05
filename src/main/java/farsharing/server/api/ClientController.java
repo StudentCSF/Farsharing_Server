@@ -2,6 +2,7 @@ package farsharing.server.api;
 
 import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
+import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -72,5 +74,12 @@ public class ClientController {
             @PathVariable(value = "client_uid") @Parameter(description = "Идентификатор клиента") UUID uid
     ) {
         this.clientService.changeClientStatus(uid);
+    }
+
+    @GetMapping("api/clients")
+    @Operation(summary = "Получение списка клиентов",
+            description = "Позволяет получить список клиентов из БД")
+    public List<ClientEntity> getAll() {
+        return this.clientService.getAll();
     }
 }

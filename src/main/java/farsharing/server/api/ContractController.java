@@ -76,8 +76,18 @@ public class ContractController {
     public RequestInfoResponse getRequestInfo(
             @PathVariable(value = "contract_uid")
             @Parameter(description = "Идентификатор контракта/заявки на бронь")
-            UUID uid
+                    UUID uid
     ) {
         return this.contractService.getRequestInfo(uid);
+    }
+
+    @PutMapping("api/admin/approve/{contract_uid}")
+    @Operation(summary = "Одобрить заявку",
+            description = "Позволяет админу одобрить заявку на бронь")
+    public void approve(
+            @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid,
+            @RequestBody Boolean approve
+    ) {
+        this.contractService.approve(uid, approve);
     }
 }
