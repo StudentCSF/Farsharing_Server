@@ -6,10 +6,12 @@ import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.AddContractRequest;
 import farsharing.server.model.dto.request.PayRequest;
 import farsharing.server.model.dto.response.CarResponse;
+import farsharing.server.model.dto.response.RequestInfoResponse;
 import farsharing.server.model.entity.CarEntity;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.ContractEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
+import farsharing.server.model.entity.enumerate.ClientStatus;
 import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.repository.CarRepository;
 import farsharing.server.repository.ClientRepository;
@@ -49,6 +51,10 @@ public class ContractService {
     public CarResponse checkCar(UUID clUid, UUID carUid) {
         if (clUid == null || carUid == null) {
             throw new RequestNotValidException();
+        }
+
+        if (this.clientRepository.findById(clUid).isEmpty()) {
+            throw new ClientNotFoundException();
         }
 
         boolean isFree = this.carRepository.findById(carUid)
@@ -93,7 +99,10 @@ public class ContractService {
     }
 
     public void pay(UUID uid, PayRequest request) {
-        if (!this.payRequestValidationComponent.isValid(request) || uid == null) {
+        if (request == null
+                || !this.payRequestValidationComponent.isValid(request)
+                || uid == null
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -138,6 +147,9 @@ public class ContractService {
     }
 
     public void cancel(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         ContractEntity contract = this.contractRepository.findById(uid)
                 .orElseThrow(ContractNotFoundException::new);
 
@@ -151,7 +163,9 @@ public class ContractService {
     }
 
     public UUID addContract(AddContractRequest addContractRequest) {
-        if (!this.addContractRequestValidationComponent.isValid(addContractRequest)) {
+        if (addContractRequest == null
+                || !this.addContractRequestValidationComponent.isValid(addContractRequest)
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -175,5 +189,45 @@ public class ContractService {
                 .build());
 
         return res;
+    }
+
+    public RequestInfoResponse getRequestInfo(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
+
+        ContractEntity contract = this.contractRepository.findById(uid)
+                .orElseThrow(ContractNotFoundException::new);
+        if (contract.getStatus() != ContractStatus.CONSIDERED) {
+            throw new ContractHaveNotConsideredStatusException();
+        }
+        ClientEntity client = this.clientRepository.findById(contract.getClient().getUid())
+                .orElseThrow(ClientNotFoundException::new);
+
+        if (client.getStatus() == ClientStatus.BANNED) {
+            throw new ClientBannedException();
+        }
+
+        return RequestInfoResponse.builder()
+                .contract(contract)
+                .client(client)
+                .build();
+    }
+
+    public void approve(UUID uid, Boolean approve) {
+        if (uid == null || approve == null) {
+            throw new RequestNotValidException();
+        }
+
+         ContractEntity contract = this.contractRepository.findById(uid)
+                 .orElseThrow(ContractNotFoundException::new);
+
+        if (contract.getStatus() != ContractStatus.CONSIDERED) {
+            throw new ContractHaveNotConsideredStatusException();
+        }
+
+        contract.setStatus(approve ? ContractStatus.APPROVED : ContractStatus.REJECTED);
+
+        this.contractRepository.save(contract);
     }
 }

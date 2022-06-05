@@ -51,6 +51,9 @@ public class UserService {
     }
 
     public UUID addUser(String login, String password) {
+        if (login.isBlank() || password.isBlank()) {
+            throw new RequestNotValidException();
+        }
         if (this.userRepository.findByEmail(login).isPresent()) {
             throw new UserAlreadyExistsException();
         }
@@ -68,6 +71,9 @@ public class UserService {
     }
 
     public void setActivationCode(UUID uid, Integer code) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         UserEntity user = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -81,12 +87,20 @@ public class UserService {
     }
 
     public boolean activateAccount(UUID uid, Integer code) {
-        if (code < 1000 || code > 9999) {
+        if (uid == null || code == null || code < 1000 || code > 9999) {
             throw new RequestNotValidException();
         }
 
         UserEntity user = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
+
+        if (user.getRole() != UserRole.CLIENT) {
+            throw new UserIsNotClientException();
+        }
+
+        if (user.getActivationCode() == null) {
+            throw new UserAlreadyActivatedAccount();
+        }
 
         if (user.getActivationCode().equals(code)) {
             user.setActivationCode(null);
@@ -96,11 +110,17 @@ public class UserService {
     }
 
     public UserEntity getUser(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         return this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     public void deleteUser(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         UserEntity user = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
         user.setRole(UserRole.DELETED);
@@ -109,12 +129,19 @@ public class UserService {
     }
 
     public void updateUser(UserRequest userRequest, UUID uid) {
+        if (userRequest == null
+                || !this.userRequestValidationComponent.isValid(userRequest)
+                || uid == null
+        ) {
+            throw new RequestNotValidException();
+        }
+
         UserEntity userEntity = this.userRepository.findById(uid)
                 .orElseThrow(UserNotFoundException::new);
 
         Optional<UserEntity> u2 = this.userRepository.findByEmail(userRequest.getEmail());
         if (u2.isPresent() && !u2.get().getUid().equals(uid)) {
-            throw new SuchEmailAlreadyExistException();
+            throw new UserWithSuchEmailAlreadyExistsException();
         }
 
         userEntity.setEmail(userRequest.getEmail());
@@ -125,7 +152,9 @@ public class UserService {
     }
 
     public IAuthResponse auth(UserRequest userRequest) {
-        if (!this.userRequestValidationComponent.isValid(userRequest)) {
+        if (userRequest == null
+                || !this.userRequestValidationComponent.isValid(userRequest)
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -140,15 +169,15 @@ public class UserService {
         AuthClientResponse ac;
 
         if (user.getRole() == UserRole.ADMIN) {
-             aa = AuthAdminResponse.builder()
+            aa = AuthAdminResponse.builder()
                     .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
                     .build();
-             ac = null;
+            ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
             if (user.getActivationCode() != null) {
                 throw new NotConfirmedAccountException();
             }
-            ac =  AuthClientResponse.builder()
+            ac = AuthClientResponse.builder()
                     .uid(this.clientRepository.findByUserUid(user.getUid())
                             .orElseThrow(ClientNotFoundException::new)
                             .getUid())

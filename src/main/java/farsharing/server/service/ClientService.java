@@ -19,6 +19,7 @@ import farsharing.server.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,7 +54,9 @@ public class ClientService {
     }
 
     public void addClient(ClientRequest clientRequest) {
-        if (!this.clientRequestValidationComponent.isValid(clientRequest)) {
+        if (clientRequest == null
+                ||!this.clientRequestValidationComponent.isValid(clientRequest)
+        ) {
             throw new RequestNotValidException();
         }
 
@@ -94,6 +97,9 @@ public class ClientService {
     }
 
     public ClientDataResponse getData(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         ClientEntity client = this.clientRepository.findById(uid)
                 .orElseThrow(ClientNotFoundException::new);
 
@@ -128,23 +134,29 @@ public class ClientService {
     }
 
     public void delete(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
         this.userService.deleteUser(this.clientRepository.findById(uid)
                 .orElseThrow(ClientNotFoundException::new)
                 .getUser().getUid());
     }
 
     public void update(UUID uid, ClientRequest clientRequest) {
-        if (!this.clientRequestValidationComponent.isValid(clientRequest)) {
+        if (uid == null
+                || clientRequest == null
+                || !this.clientRequestValidationComponent.isValid(clientRequest)
+        ) {
             throw new RequestNotValidException();
         }
+
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
 
         Optional<ClientEntity> otherClient = this.clientRepository.findByLicense(clientRequest.getLicense());
         if (otherClient.isPresent() && !otherClient.get().getUid().equals(uid)) {
             throw new ClientAlreadyExistsException();
         }
-
-        ClientEntity client = this.clientRepository.findById(uid)
-                .orElseThrow(ClientNotFoundException::new);
 
         UserRequest userRequest = new UserRequest();
         userRequest.setEmail(clientRequest.getEmail());
@@ -168,5 +180,23 @@ public class ClientService {
         client.setWallet(wallet);
 
         this.clientRepository.save(client);
+    }
+
+    public void changeClientStatus(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
+
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
+
+        boolean bnd = client.getStatus() == ClientStatus.BANNED;
+        client.setStatus(bnd ? ClientStatus.DEFAULT : ClientStatus.BANNED);
+
+        this.clientRepository.save(client);
+    }
+
+    public List<ClientEntity> getAll() {
+        return this.clientRepository.findAll();
     }
 }

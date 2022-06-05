@@ -3,6 +3,7 @@ package farsharing.server.api;
 import farsharing.server.model.dto.request.AddContractRequest;
 import farsharing.server.model.dto.request.PayRequest;
 import farsharing.server.model.dto.response.CarResponse;
+import farsharing.server.model.dto.response.RequestInfoResponse;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.service.ContractService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,5 +68,26 @@ public class ContractController {
             description = "Позволяет оформить заявку на бронь")
     public UUID request(@RequestBody AddContractRequest addContractRequest) {
         return this.contractService.addContract(addContractRequest);
+    }
+
+    @GetMapping("/api/admin/request_info/{contract_uid}")
+    @Operation(summary = "Информация о заявке",
+            description = "Позволяет получить информацию о заявке и клиенте")
+    public RequestInfoResponse getRequestInfo(
+            @PathVariable(value = "contract_uid")
+            @Parameter(description = "Идентификатор контракта/заявки на бронь")
+                    UUID uid
+    ) {
+        return this.contractService.getRequestInfo(uid);
+    }
+
+    @PutMapping("api/admin/approve/{contract_uid}")
+    @Operation(summary = "Одобрить заявку",
+            description = "Позволяет админу одобрить заявку на бронь")
+    public void approve(
+            @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid,
+            @RequestBody Boolean approve
+    ) {
+        this.contractService.approve(uid, approve);
     }
 }
