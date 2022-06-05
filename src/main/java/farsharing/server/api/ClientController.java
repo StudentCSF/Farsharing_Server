@@ -64,4 +64,13 @@ public class ClientController {
             @PathVariable(value = "client_uid") @Parameter(description = "Идентификатор клиента") UUID uid) {
         return this.clientService.getData(uid);
     }
+
+    @PutMapping("/api/client/ban/{client_uid}")
+    @Operation(summary = "Бан/разбан клиента",
+            description = "Позволяет забанить/разбанить клиента")
+    public void changeClientStatus(
+            @PathVariable(value = "client_uid") @Parameter(description = "Идентификатор клиента") UUID uid
+    ) {
+        this.clientService.changeClientStatus(uid);
+    }
 }

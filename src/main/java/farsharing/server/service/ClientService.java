@@ -169,4 +169,18 @@ public class ClientService {
 
         this.clientRepository.save(client);
     }
+
+    public void changeClientStatus(UUID uid) {
+        if (uid == null) {
+            throw new RequestNotValidException();
+        }
+
+        ClientEntity client = this.clientRepository.findById(uid)
+                .orElseThrow(ClientNotFoundException::new);
+
+        boolean bnd = client.getStatus() == ClientStatus.BANNED;
+        client.setStatus(bnd ? ClientStatus.DEFAULT : ClientStatus.BANNED);
+
+        this.clientRepository.save(client);
+    }
 }
