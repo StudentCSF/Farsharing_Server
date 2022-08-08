@@ -86,8 +86,6 @@ public class ContractService {
                 .isFree(isFree)
                 .thisClient(thisClient)
                 .status(status)
-                .xCoord(x)
-                .yCoord(y)
                 .contractUid(contractUid)
                 .build();
     }
