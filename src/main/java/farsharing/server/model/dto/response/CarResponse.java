@@ -23,10 +23,4 @@ public class CarResponse {
 
     @Schema(description = "Идентификатор контракта")
     private UUID contractUid;
-
-    @Schema(description = "Координата 'икс' контракта")
-    private Double xCoord;
-
-    @Schema(description = "Координата 'игрек' контракта")
-    private Double yCoord;
 }
