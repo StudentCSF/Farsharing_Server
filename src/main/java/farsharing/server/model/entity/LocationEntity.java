@@ -18,9 +18,14 @@ public class LocationEntity {
     @Id
     private UUID uid;
 
-    @Column(nullable = false, name = "country")
-    private String country;
+//    @Column(nullable = false, name = "country")
+//    private String country;
+//
+//    @Column(name = "city", nullable = false)
+//    private String city;
+    @Column(name = "x_coord")
+    private Double x;
 
-    @Column(name = "city", nullable = false)
-    private String city;
+    @Column(name = "y_coord")
+    private Double y;
 }
