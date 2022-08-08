@@ -24,7 +24,7 @@ public class MessageController {
     }
 
     @PostMapping("/api/message")
-    @Operation(summary = "добавление сообщения",
+    @Operation(summary = "Добавление сообщения",
             description = "Позволяет добавить сообщение в БД")
     public void addMessage(
             @RequestBody MessageRequest messageRequest) {

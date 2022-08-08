@@ -57,9 +57,12 @@ public class ContractService {
             throw new ClientNotFoundException();
         }
 
-        boolean isFree = this.carRepository.findById(carUid)
-                .orElseThrow(CarNotFoundException::new)
-                .getIsAvailable();
+        CarEntity car = this.carRepository.findById(carUid)
+                .orElseThrow(CarNotFoundException::new);
+
+        boolean isFree = car.getIsAvailable();
+        double x = car.getLocation().getX(),
+                y = car.getLocation().getY();
 
         boolean thisClient;
         ContractStatus status;
@@ -83,6 +86,8 @@ public class ContractService {
                 .isFree(isFree)
                 .thisClient(thisClient)
                 .status(status)
+                .xCoord(x)
+                .yCoord(y)
                 .contractUid(contractUid)
                 .build();
     }

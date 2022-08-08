@@ -35,7 +35,8 @@ class CarServiceTest {
         req.setBodyType("null");
         req.setBrand("null");
         req.setColor("красный");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(123f);
         req.setPricePerHour(123456f);
         req.setModel("null");
@@ -43,19 +44,20 @@ class CarServiceTest {
         Assertions.assertThrows(BodyTypeNotFoundException.class, () -> service.addCar(req));
     }
 
-    @Test
-    void addCar4() {
-        AddCarRequest req = new AddCarRequest();
-        req.setBodyType("купе");
-        req.setBrand("null");
-        req.setColor("серый");
-        req.setLocation(UUID.randomUUID());
-        req.setMileage(1f);
-        req.setPricePerHour(1f);
-        req.setModel("null");
-        req.setStateNumber("88228");
-        Assertions.assertThrows(LocationNotFoundException.class, () -> service.addCar(req));
-    }
+//    @Test
+//    void addCar4() {
+//        AddCarRequest req = new AddCarRequest();
+//        req.setBodyType("купе");
+//        req.setBrand("null");
+//        req.setColor("серый");
+//        req.setXCoord(23.);
+//        req.setYCoord(23.2);
+//        req.setMileage(1f);
+//        req.setPricePerHour(1f);
+//        req.setModel("null");
+//        req.setStateNumber("88228");
+//        Assertions.assertThrows(LocationNotFoundException.class, () -> service.addCar(req));
+//    }
 
     @Test
     void addCar5() {
@@ -63,7 +65,8 @@ class CarServiceTest {
         req.setBodyType("купе");
         req.setBrand("null");
         req.setColor("тгдд");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(123f);
         req.setPricePerHour(123456f);
         req.setModel("null");
@@ -77,7 +80,8 @@ class CarServiceTest {
         req.setBodyType(null);
         req.setBrand(null);
         req.setColor(null);
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(null);
         req.setPricePerHour(null);
         req.setModel(null);
@@ -91,7 +95,8 @@ class CarServiceTest {
         req.setBodyType("купе");
         req.setBrand("null");
         req.setColor("серый");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(1f);
         req.setPricePerHour(1f);
         req.setModel("null");
@@ -105,7 +110,8 @@ class CarServiceTest {
         req.setBodyType("купе");
         req.setBrand("null");
         req.setColor("серый");
-        req.setLocation(UUID.fromString("5e3d59d9-0f40-4f37-a164-5aa7f3fcd6ea"));
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(1f);
         req.setPricePerHour(1f);
         req.setModel("null");
@@ -152,7 +158,8 @@ class CarServiceTest {
         req.setBodyType("тгдд");
         req.setBrand("null");
         req.setColor("wer");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(1f);
         req.setIsAvailable(null);
         req.setPricePerHour(1f);
@@ -167,7 +174,8 @@ class CarServiceTest {
         req.setBodyType("das");
         req.setBrand("null");
         req.setColor("wer");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(1f);
         req.setIsAvailable(false);
         req.setPricePerHour(1f);
@@ -182,7 +190,8 @@ class CarServiceTest {
         req.setBodyType("купе");
         req.setBrand("null");
         req.setColor("wer");
-        req.setLocation(null);
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(1f);
         req.setIsAvailable(false);
         req.setPricePerHour(1f);
@@ -197,7 +206,8 @@ class CarServiceTest {
         req.setBodyType("купе");
         req.setBrand("mers");
         req.setColor("серый");
-        req.setLocation(UUID.fromString("5e3d59d9-0f40-4f37-a164-5aa7f3fcd6ea"));
+        req.setXCoord(23.);
+        req.setYCoord(23.2);
         req.setMileage(228f);
         req.setIsAvailable(false);
         req.setPricePerHour(1000f);
