@@ -29,8 +29,12 @@ public class UpdateCarRequest {
     private String bodyType;
 
     @NotNull
-    @Schema(description = "Идентификатор нового местоположения")
-    private UUID location;
+    @Schema(description = "Координата 'икс' нового местоположения")
+    private Double xCoord;
+
+    @NotNull
+    @Schema(description = "Координата 'игрек' нового местоположения")
+    private Double yCoord;
 
     @NotNull
     @Min(1)

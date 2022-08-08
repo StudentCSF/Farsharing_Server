@@ -29,8 +29,12 @@ public class AddCarRequest {
     private String bodyType;
 
     @NotNull
-    @Schema(description = "Идентификатор местоположения")
-    private UUID location;
+    @Schema(description = "Координата 'икс' авто")
+    private Double xCoord;
+
+    @NotNull
+    @Schema(description = "Координата 'игрек' авто")
+    private Double yCoord;
 
     @NotBlank
     @Schema(description = "Госномер")

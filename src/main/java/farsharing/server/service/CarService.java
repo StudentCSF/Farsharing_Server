@@ -63,8 +63,16 @@ public class CarService {
         BodyTypeEntity bodyTypeEntity = this.bodyTypeRepository.findById(addCarRequest.getBodyType())
                 .orElseThrow(BodyTypeNotFoundException::new);
 
-        LocationEntity locationEntity = this.locationRepository.findById(addCarRequest.getLocation())
-                .orElseThrow(LocationNotFoundException::new);
+//        LocationEntity locationEntity = this.locationRepository.findById(addCarRequest.getLocation())
+//                .orElseThrow(LocationNotFoundException::new);
+
+        LocationEntity locationEntity = this.locationRepository.save(
+                LocationEntity.builder()
+                        .uid(UUID.randomUUID())
+                        .x(addCarRequest.getXCoord())
+                        .y(addCarRequest.getYCoord())
+                        .build()
+        );
 
         ColorEntity colorEntity = this.colorRepository.findById(addCarRequest.getColor())
                 .orElseThrow(ColorNotFoundException::new);
@@ -125,8 +133,19 @@ public class CarService {
                 .orElseThrow(ColorNotFoundException::new));
 
 
-        carEntity.setLocation(this.locationRepository.findById(updateCarRequest.getLocation())
-                .orElseThrow(LocationNotFoundException::new));
+        double x = updateCarRequest.getXCoord(),
+                y = updateCarRequest.getYCoord(),
+                eps = 1e-3;
+        if (Math.abs(x - carEntity.getLocation().getX()) > eps
+                || Math.abs(y - carEntity.getLocation().getY()) > eps) {
+            carEntity.setLocation(this.locationRepository.save(
+                    LocationEntity.builder()
+                            .uid(UUID.randomUUID())
+                            .x(x)
+                            .y(y)
+                            .build()
+            ));
+        }
 
         carEntity.setMileage(updateCarRequest.getMileage());
 
