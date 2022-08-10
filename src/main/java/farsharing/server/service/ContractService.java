@@ -106,7 +106,7 @@ public class ContractService {
                 .getWallet();
     }
 
-    public int pay(UUID uid, PayRequest request) {
+    public Integer pay(UUID uid, PayRequest request) {
         if (request == null
                 || !this.payRequestValidationComponent.isValid(request)
                 || uid == null
@@ -156,7 +156,7 @@ public class ContractService {
         return generateCode();
     }
 
-    private int generateCode() {
+    private Integer generateCode() {
         return this.randomizer.nextInt(9000) + 1000;
     }
 
