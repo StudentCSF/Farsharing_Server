@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -35,17 +36,21 @@ public class ContractService {
 
     private final AddContractRequestValidationComponent addContractRequestValidationComponent;
 
+    private final Random randomizer;
+
     @Autowired
     public ContractService(ContractRepository contractRepository,
                            CarRepository carRepository,
                            ClientRepository clientRepository,
                            PayRequestValidationComponent payRequestValidationComponent,
-                           AddContractRequestValidationComponent addContractRequestValidationComponent) {
+                           AddContractRequestValidationComponent addContractRequestValidationComponent,
+                           Random randomizer) {
         this.contractRepository = contractRepository;
         this.carRepository = carRepository;
         this.clientRepository = clientRepository;
         this.payRequestValidationComponent = payRequestValidationComponent;
         this.addContractRequestValidationComponent = addContractRequestValidationComponent;
+        this.randomizer = randomizer;
     }
 
     public CarResponse checkCar(UUID clUid, UUID carUid) {
@@ -101,7 +106,7 @@ public class ContractService {
                 .getWallet();
     }
 
-    public void pay(UUID uid, PayRequest request) {
+    public int pay(UUID uid, PayRequest request) {
         if (request == null
                 || !this.payRequestValidationComponent.isValid(request)
                 || uid == null
@@ -147,6 +152,12 @@ public class ContractService {
 
         contract.setStatus(ContractStatus.ACTIVE);
         this.contractRepository.save(contract);
+
+        return generateCode();
+    }
+
+    private int generateCode() {
+        return this.randomizer.nextInt(9000) + 1000;
     }
 
     public void cancel(UUID uid) {

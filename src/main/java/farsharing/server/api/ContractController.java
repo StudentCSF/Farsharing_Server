@@ -47,11 +47,11 @@ public class ContractController {
 
     @PutMapping("/api/pay/{contract_uid}")
     @Operation(summary = "Оплата брони",
-            description = "Позволяет провести оплату брони")
-    public void pay(
+            description = "Позволяет провести оплату брони. Возвращает 4-хзначный код из цифр (типа спецкод от машины)")
+    public int pay(
             @PathVariable(value = "contract_uid") @Parameter(description = "Идентификатор контракта/брони") UUID uid,
             @RequestBody PayRequest request) {
-        this.contractService.pay(uid, request);
+        return this.contractService.pay(uid, request);
     }
 
     @GetMapping("/api/contract/cancel/{contract_uid}")
