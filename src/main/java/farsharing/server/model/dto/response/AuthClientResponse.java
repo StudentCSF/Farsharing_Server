@@ -14,7 +14,7 @@ import java.util.UUID;
 public class AuthClientResponse {
 
     @Schema(description = "Идентификатор клиента (не пользователся/юзера!)")
-    private UUID uid;
+    private UUID clientUid;
 
     @Schema(description = "Cписок машин")
     private List<CarEntity> cars;
