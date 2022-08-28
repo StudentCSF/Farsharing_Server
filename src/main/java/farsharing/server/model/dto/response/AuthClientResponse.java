@@ -13,8 +13,8 @@ import java.util.UUID;
 @Schema(description = "Cущность с информацией для клиента")
 public class AuthClientResponse {
 
-    @Schema(description = "Идентификатор клиента")
-    private UUID uid;
+//    @Schema(description = "Идентификатор клиента")
+//    private UUID uid;
 
     @Schema(description = "Cписок машин")
     private List<CarEntity> cars;
