@@ -196,6 +196,12 @@ public class ClientService {
         this.clientRepository.save(client);
     }
 
+//    public UUID getClientUid(UUID userUid) {
+//        return this.clientRepository.findByUserUid(userUid)
+//                .orElseThrow(ClientNotFoundException::new).getUid();
+//    }
+
+
     public List<ClientEntity> getAll() {
         return this.clientRepository.findAll();
     }

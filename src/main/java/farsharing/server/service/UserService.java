@@ -178,9 +178,9 @@ public class UserService {
                 throw new NotConfirmedAccountException();
             }
             ac = AuthClientResponse.builder()
-//                    .uid(this.clientRepository.findByUserUid(user.getUid())
-//                            .orElseThrow(ClientNotFoundException::new)
-//                            .getUid())
+                    .uid(this.clientRepository.findByUserUid(user.getUid())
+                            .orElseThrow(ClientNotFoundException::new)
+                            .getUid())
                     .cars(this.carRepository.findAll())
                     .build();
             aa = null;
