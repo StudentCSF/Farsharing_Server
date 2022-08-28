@@ -12,7 +12,7 @@ import java.util.UUID;
 public class IAuthResponse {
 
     @Schema(description = "Идентификатор пользователя")
-    private UUID uid;
+    private UUID userUid;
 
     private AuthAdminResponse authAdminResponse;
 
