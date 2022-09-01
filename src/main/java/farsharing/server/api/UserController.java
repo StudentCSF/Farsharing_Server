@@ -57,6 +57,6 @@ public class UserController {
             description = "Позволяет авторизоваться в приложении")
     public IAuthResponse auth(@RequestBody UserRequest userRequest)
     {
-        return this.userService.auth(userRequest);
+        return this.userService.auth(userRequest, false);
     }
 }
