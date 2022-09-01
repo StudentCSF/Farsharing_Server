@@ -49,7 +49,7 @@ public class CarController {
     @GetMapping("/api/cars")
     @Operation(
             summary = "Получение списка машин",
-            description = "Позволяет получить список всех машин с краткой информацией о них"
+            description = "Позволяет получить список всех машин"
     )
     public List<CarEntity> getCars() {
         return this.carService.getCars();
