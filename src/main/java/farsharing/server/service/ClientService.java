@@ -53,9 +53,9 @@ public class ClientService {
         this.contractRepository = contractRepository;
     }
 
-    public void addClient(ClientRequest clientRequest) {
+    public ClientDataResponse addClient(ClientRequest clientRequest) {
         if (clientRequest == null
-                ||!this.clientRequestValidationComponent.isValid(clientRequest)
+                || !this.clientRequestValidationComponent.isValid(clientRequest)
         ) {
             throw new RequestNotValidException();
         }
@@ -77,7 +77,7 @@ public class ClientService {
                 .validThru(this.stringHandlerComponent.emptyLikeNull(clientRequest.getValidThru()))
                 .build();
 
-        this.clientRepository.save(ClientEntity.builder()
+        ClientEntity newClient = ClientEntity.builder()
                 .user(this.userService.getUser(userUid))
                 .wallet(wallet)
                 .uid(UUID.randomUUID())
@@ -89,11 +89,37 @@ public class ClientService {
                 .address(this.stringHandlerComponent.emptyLikeNull(clientRequest.getAddress()))
                 .firstName(clientRequest.getFirstName())
                 .lastName(clientRequest.getLastName())
-                .build());
+                .build();
+
+        this.clientRepository.save(newClient);
 
         int code = this.mailSenderComponent.sendActivationCode(clientRequest.getEmail());
 
         this.userService.setActivationCode(userUid, code);
+
+        return ClientDataResponse.builder()
+                .firstName(newClient.getFirstName())
+                .license(newClient.getLicense())
+                .lastName(newClient.getLastName())
+                .midName(newClient.getMidName())
+                .validThru(wallet.getValidThru())
+                .email(newClient.getUser().getEmail())
+                .password(newClient.getUser().getPassword())
+                .cvv(wallet.getCvv() + "")
+                .cardNumber(wallet.getCard())
+                .status(newClient.getStatus())
+                .accidents(newClient.getAccidents())
+                .phoneNumber(newClient.getPhoneNumber())
+                .address(newClient.getAddress())
+                .existsActiveContract(this.clientHasActiveContract(newClient.getUid()))
+                .build();
+    }
+
+    private Boolean clientHasActiveContract(UUID clientUid) {
+        return !this.contractRepository.findAllByClientUidAndStatus(
+                clientUid,
+                ContractStatus.ACTIVE
+        ).isEmpty();
     }
 
     public ClientDataResponse getData(UUID uid) {
@@ -107,8 +133,7 @@ public class ClientService {
 
         WalletEmbeddable wallet = client.getWallet();
 
-        Boolean existsContract = !this.contractRepository.findAllByClientUidAndStatus(uid, ContractStatus.ACTIVE)
-                .isEmpty();
+        Boolean existsContract = this.clientHasActiveContract(uid);
 
         ClientDataResponse res = ClientDataResponse.builder()
                 .accidents(client.getAccidents())
