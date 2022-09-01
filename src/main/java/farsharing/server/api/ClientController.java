@@ -27,8 +27,8 @@ public class ClientController {
     @PostMapping("/api/client/register")
     @Operation(summary = "Регистрация клиента",
             description = "Позволяет зарегистрировать клиента")
-    public void addClient(@RequestBody ClientRequest clientRequest) {
-        this.clientService.addClient(clientRequest);
+    public ClientDataResponse addClient(@RequestBody ClientRequest clientRequest) {
+        return this.clientService.addClient(clientRequest);
     }
 
 //    @GetMapping("/api/client/{uid}")
