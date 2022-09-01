@@ -2,7 +2,7 @@ package farsharing.server.api;
 
 import farsharing.server.model.dto.request.AddCarRequest;
 import farsharing.server.model.dto.request.UpdateCarRequest;
-import farsharing.server.model.dto.response.BriefCarInfoResponse;
+//import farsharing.server.model.dto.response.BriefCarInfoResponse;
 import farsharing.server.model.entity.CarEntity;
 import farsharing.server.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "Контроллер автомобилей", description = "Позволяет добавлять и удалять машины и обновлять их данные ")
@@ -51,17 +51,17 @@ public class CarController {
             summary = "Получение списка машин",
             description = "Позволяет получить список всех машин с краткой информацией о них"
     )
-    public List<BriefCarInfoResponse> getCars() {
-        List<CarEntity> carEntityList = this.carService.getCars();
+    public List<CarEntity> getCars() {
+        return this.carService.getCars();
 
-        return carEntityList.stream()
-                .map(item -> BriefCarInfoResponse.builder()
-                        .brand(item.getBrand())
-                        .isAvailable(item.getIsAvailable())
-                        .stateNumber(item.getStateNumber())
-                        .model(item.getModel())
-                        .build())
-                .collect(Collectors.toList());
+//        return carEntityList.stream()
+//                .map(item -> BriefCarInfoResponse.builder()
+//                        .brand(item.getBrand())
+//                        .isAvailable(item.getIsAvailable())
+//                        .stateNumber(item.getStateNumber())
+//                        .model(item.getModel())
+//                        .build())
+//                .collect(Collectors.toList());
     }
 
     @DeleteMapping("/api/car/{uid}")
