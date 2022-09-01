@@ -151,7 +151,7 @@ public class UserService {
         this.userRepository.save(userEntity);
     }
 
-    public IAuthResponse auth(UserRequest userRequest) {
+    public IAuthResponse auth(UserRequest userRequest, Boolean newClient) {
         if (userRequest == null
                 || !this.userRequestValidationComponent.isValid(userRequest)
         ) {
@@ -174,7 +174,7 @@ public class UserService {
                     .build();
             ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
-            if (user.getActivationCode() != null) {
+            if (user.getActivationCode() != null && !newClient) {
                 throw new NotConfirmedAccountException();
             }
             ac = AuthClientResponse.builder()

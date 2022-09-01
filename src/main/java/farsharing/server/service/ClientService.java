@@ -9,6 +9,7 @@ import farsharing.server.exception.RequestNotValidException;
 import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
+import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
@@ -53,7 +54,7 @@ public class ClientService {
         this.contractRepository = contractRepository;
     }
 
-    public ClientDataResponse addClient(ClientRequest clientRequest) {
+    public IAuthResponse addClient(ClientRequest clientRequest) {
         if (clientRequest == null
                 || !this.clientRequestValidationComponent.isValid(clientRequest)
         ) {
@@ -97,22 +98,10 @@ public class ClientService {
 
         this.userService.setActivationCode(userUid, code);
 
-        return ClientDataResponse.builder()
-                .firstName(newClient.getFirstName())
-                .license(newClient.getLicense())
-                .lastName(newClient.getLastName())
-                .midName(newClient.getMidName())
-                .validThru(wallet.getValidThru())
-                .email(newClient.getUser().getEmail())
-                .password(newClient.getUser().getPassword())
-                .cvv(wallet.getCvv() + "")
-                .cardNumber(wallet.getCard())
-                .status(newClient.getStatus())
-                .accidents(newClient.getAccidents())
-                .phoneNumber(newClient.getPhoneNumber())
-                .address(newClient.getAddress())
-                .existsActiveContract(this.clientHasActiveContract(newClient.getUid()))
-                .build();
+        UserRequest ur = new UserRequest();
+        ur.setPassword(clientRequest.getPassword());
+        ur.setEmail(clientRequest.getEmail());
+        return this.userService.auth(ur, true);
     }
 
     private Boolean clientHasActiveContract(UUID clientUid) {

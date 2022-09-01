@@ -2,6 +2,7 @@ package farsharing.server.api;
 
 import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
+import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ public class ClientController {
     @PostMapping("/api/client/register")
     @Operation(summary = "Регистрация клиента",
             description = "Позволяет зарегистрировать клиента")
-    public ClientDataResponse addClient(@RequestBody ClientRequest clientRequest) {
+    public IAuthResponse addClient(@RequestBody ClientRequest clientRequest) {
         return this.clientService.addClient(clientRequest);
     }
 
