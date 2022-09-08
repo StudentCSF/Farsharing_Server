@@ -2,8 +2,6 @@ package farsharing.server.repository;
 
 import farsharing.server.model.entity.ContractEntity;
 import farsharing.server.model.entity.enumerate.ContractStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
