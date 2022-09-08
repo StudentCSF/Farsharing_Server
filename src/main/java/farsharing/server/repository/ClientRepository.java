@@ -1,6 +1,8 @@
 package farsharing.server.repository;
 
 import farsharing.server.model.entity.ClientEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +15,6 @@ public interface ClientRepository extends JpaRepository<ClientEntity, UUID> {
     Optional<ClientEntity> findByLicense(String license);
 
     Optional<ClientEntity> findByUserUid(UUID uid);
+
+    Page<ClientEntity> findAll(Pageable pageable);
 }

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -218,5 +219,19 @@ public class ClientService {
 
     public List<ClientEntity> getAll() {
         return this.clientRepository.findAll();
+    }
+
+    public List<UUID> getCurrentClientAll(UUID clientUid) {
+        if (clientUid == null) {
+            throw new RequestNotValidException();
+        }
+        List<UUID> result = this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.APPROVED).stream()
+                .map(x -> x.getCar().getUid())
+                .collect(Collectors.toList());
+        result.addAll(this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.ACTIVE)
+                .stream()
+                .map(x -> x.getCar().getUid())
+                .collect(Collectors.toList()));
+        return result;
     }
 }

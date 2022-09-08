@@ -6,7 +6,6 @@ import farsharing.server.model.dto.request.MessageRequest;
 import farsharing.server.model.entity.MessageEntity;
 import farsharing.server.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

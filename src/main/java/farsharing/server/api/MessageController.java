@@ -16,7 +16,7 @@ import java.util.UUID;
 @Tag(name = "Контроллер сообщений в техподдержку", description = "Позволяет добавлять и удалять текстовые обращения в техподдержку")
 public class MessageController {
 
-    private MessageService messageService;
+    private final MessageService messageService;
 
     @Autowired
     public MessageController(MessageService messageService) {
