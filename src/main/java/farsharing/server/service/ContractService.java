@@ -194,7 +194,7 @@ public class ContractService {
         this.contractRepository.save(ContractEntity.builder()
                 .uid(res)
                 .car(car)
-                .status(ContractStatus.CONSIDERED)
+                .status(ContractStatus.APPROVED)
                 .startTime(addContractRequest.getStartTime())
                 .endTime(addContractRequest.getEndTime())
                 .client(this.clientRepository.findById(
