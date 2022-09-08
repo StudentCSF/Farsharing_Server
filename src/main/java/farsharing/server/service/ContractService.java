@@ -1,6 +1,7 @@
 package farsharing.server.service;
 
 import farsharing.server.component.AddContractRequestValidationComponent;
+import farsharing.server.component.MailSenderComponent;
 import farsharing.server.component.PayRequestValidationComponent;
 import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.AddContractRequest;
@@ -36,7 +37,7 @@ public class ContractService {
 
     private final AddContractRequestValidationComponent addContractRequestValidationComponent;
 
-    private final Random randomizer;
+    private final MailSenderComponent mailSenderComponent;
 
     @Autowired
     public ContractService(ContractRepository contractRepository,
@@ -44,13 +45,13 @@ public class ContractService {
                            ClientRepository clientRepository,
                            PayRequestValidationComponent payRequestValidationComponent,
                            AddContractRequestValidationComponent addContractRequestValidationComponent,
-                           Random randomizer) {
+                           MailSenderComponent mailSenderComponent) {
         this.contractRepository = contractRepository;
         this.carRepository = carRepository;
         this.clientRepository = clientRepository;
         this.payRequestValidationComponent = payRequestValidationComponent;
         this.addContractRequestValidationComponent = addContractRequestValidationComponent;
-        this.randomizer = randomizer;
+        this.mailSenderComponent = mailSenderComponent;
     }
 
     public CarResponse checkCar(UUID clUid, UUID carUid) {
@@ -153,11 +154,7 @@ public class ContractService {
         contract.setStatus(ContractStatus.ACTIVE);
         this.contractRepository.save(contract);
 
-        return generateCode();
-    }
-
-    private Integer generateCode() {
-        return this.randomizer.nextInt(9000) + 1000;
+        return this.mailSenderComponent.sendCarCode(car, client.getUser().getEmail());
     }
 
     public void cancel(UUID uid) {
