@@ -42,6 +42,15 @@ public class ClientController {
 //        return null;
 //    }
 
+    @GetMapping("/api/client/{client_uid}/cars")
+    @Operation(summary = "Получение идентификаторов забронированных клиентом машин",
+            description = "Позволяет получить идентификаторы машин, которые в момент запроса забронированы клиентом")
+    public List<UUID> getCurrentClientCars(
+            @PathVariable("client_uid") @Parameter(description = "Идентификатор клиента") UUID clientUid
+    ) {
+        return this.clientService.getCurrentClientAll(clientUid);
+    }
+
     @DeleteMapping("/api/client/delete/{client_uid}")
     @Operation(summary = "Удаление клиента",
             description = "Позволяет деактивировать учетную запись клиента")
