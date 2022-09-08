@@ -1,9 +1,9 @@
 package farsharing.server.api;
 
 import farsharing.server.model.dto.request.UserRequest;
+import farsharing.server.model.dto.response.IAuthPageableResponse;
 import farsharing.server.model.dto.response.IAuthResponse;
 import farsharing.server.model.entity.ClientEntity;
-import farsharing.server.model.entity.UserEntity;
 import farsharing.server.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -60,6 +60,13 @@ public class UserController {
             description = "Позволяет авторизоваться в приложении")
     public IAuthResponse auth(@RequestBody UserRequest userRequest) {
         return this.userService.auth(userRequest, false);
+    }
+
+    @PostMapping("/api/user/auth2")
+    @Operation(summary = "Авторизация",
+            description = "Позволяет авторизоваться в приложении")
+    public IAuthPageableResponse auth2(@RequestBody UserRequest userRequest) {
+        return this.userService.authPageable(userRequest, false);
     }
 
     @GetMapping("/api/user/{pageNumber}")
