@@ -3,17 +3,17 @@ package farsharing.server.service;
 import farsharing.server.component.UserRequestValidationComponent;
 import farsharing.server.exception.*;
 import farsharing.server.model.dto.request.UserRequest;
-import farsharing.server.model.dto.response.AuthAdminResponse;
-import farsharing.server.model.dto.response.AuthClientResponse;
-import farsharing.server.model.dto.response.IAuthResponse;
+import farsharing.server.model.dto.response.*;
+import farsharing.server.model.entity.ClientEntity;
 import farsharing.server.model.entity.UserEntity;
-import farsharing.server.model.entity.enumerate.ContractStatus;
 import farsharing.server.model.entity.enumerate.UserRole;
 import farsharing.server.repository.CarRepository;
 import farsharing.server.repository.ClientRepository;
-import farsharing.server.repository.ContractRepository;
+//import farsharing.server.repository.ContractRepository;
 import farsharing.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class UserService {
 
     private final CarRepository carRepository;
 
-    private final ContractRepository contractRepository;
+//    private final ContractRepository contractRepository;
 
     private final ClientRepository clientRepository;
 
@@ -40,13 +40,13 @@ public class UserService {
                        BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserRequestValidationComponent userRequestValidationComponent,
                        CarRepository carRepository,
-                       ContractRepository contractRepository,
+//                       ContractRepository contractRepository,
                        ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRequestValidationComponent = userRequestValidationComponent;
         this.carRepository = carRepository;
-        this.contractRepository = contractRepository;
+//        this.contractRepository = contractRepository;
         this.clientRepository = clientRepository;
     }
 
@@ -170,7 +170,7 @@ public class UserService {
 
         if (user.getRole() == UserRole.ADMIN) {
             aa = AuthAdminResponse.builder()
-                    .contracts(this.contractRepository.findAllByStatus(ContractStatus.CONSIDERED))
+                    .clients(this.clientRepository.findAll())
                     .build();
             ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
@@ -192,5 +192,55 @@ public class UserService {
                 .authAdminResponse(aa)
                 .authClientResponse(ac)
                 .build();
+    }
+
+    public IAuthPageableResponse authPageable(UserRequest userRequest, Boolean newClient) {
+        if (userRequest == null
+                || !this.userRequestValidationComponent.isValid(userRequest)
+        ) {
+            throw new RequestNotValidException();
+        }
+
+        UserEntity user = this.userRepository.findByEmail(userRequest.getEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!this.bCryptPasswordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
+            throw new WrongPasswordException();
+        }
+
+        AuthAdminPageableResponse aa;
+        AuthClientPageableResponse ac;
+
+        if (user.getRole() == UserRole.ADMIN) {
+            aa = AuthAdminPageableResponse.builder()
+                    .clients(this.clientRepository.findAll(PageRequest.of(0, 6)))
+                    .build();
+            ac = null;
+        } else if (user.getRole() == UserRole.CLIENT) {
+            if (user.getActivationCode() != null && !newClient) {
+                throw new NotConfirmedAccountException();
+            }
+            ac = AuthClientPageableResponse.builder()
+                    .clientUid(this.clientRepository.findByUserUid(user.getUid())
+                            .orElseThrow(ClientNotFoundException::new)
+                            .getUid())
+                    .cars(this.carRepository.findAll(PageRequest.of(0, 6)))
+                    .build();
+            aa = null;
+        } else {
+            return null;
+        }
+        return IAuthPageableResponse.builder()
+                .userUid(user.getUid())
+                .authAdminResponse(aa)
+                .authClientResponse(ac)
+                .build();
+    }
+
+    public Page<ClientEntity> getClients(Integer pageNumber) {
+        if (pageNumber == null || pageNumber < 0) {
+            throw new RequestNotValidException();
+        }
+        return this.clientRepository.findAll(PageRequest.of(pageNumber, 6));
     }
 }

@@ -14,6 +14,8 @@ import farsharing.server.repository.CarRepository;
 import farsharing.server.repository.ColorRepository;
 import farsharing.server.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -135,7 +137,7 @@ public class CarService {
 
         double x = updateCarRequest.getXCoord(),
                 y = updateCarRequest.getYCoord(),
-                eps = 1e-3;
+                eps = 1e-9;
         if (Math.abs(x - carEntity.getLocation().getX()) > eps
                 || Math.abs(y - carEntity.getLocation().getY()) > eps) {
             carEntity.setLocation(this.locationRepository.save(
@@ -154,5 +156,12 @@ public class CarService {
         carEntity.setIsAvailable(updateCarRequest.getIsAvailable());
 
         this.carRepository.save(carEntity);
+    }
+
+    public Page<CarEntity> getCars(Integer pageNumber) {
+        if (pageNumber == null || pageNumber < 0) {
+            throw new RequestNotValidException();
+        }
+        return this.carRepository.findAll(PageRequest.of(pageNumber, 6));
     }
 }

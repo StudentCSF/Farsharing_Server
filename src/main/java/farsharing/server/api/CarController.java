@@ -4,11 +4,13 @@ import farsharing.server.model.dto.request.AddCarRequest;
 import farsharing.server.model.dto.request.UpdateCarRequest;
 //import farsharing.server.model.dto.response.BriefCarInfoResponse;
 import farsharing.server.model.entity.CarEntity;
+import farsharing.server.model.entity.UserEntity;
 import farsharing.server.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -85,5 +87,16 @@ public class CarController {
             @PathVariable @Parameter(description = "Идентификатор машины") UUID uid
     ) {
         this.carService.updateCar(updateCarRequest, uid);
+    }
+
+    @GetMapping("/api/cars/{pageNumber}")
+    @Operation(summary = "Получение определенной страницы с машинами",
+            description = "Позволяет получить запрошенную страницу с машинами")
+    public Page<CarEntity> getCars(
+            @PathVariable("pageNumber")
+            @Parameter(description = "Номер страницы (нумерация начинается с нуля)")
+                    Integer pageNumber
+    ) {
+        return this.carService.getCars(pageNumber);
     }
 }
