@@ -126,14 +126,15 @@ public class ContractService {
                 .orElseThrow(ClientNotFoundException::new);
 
         Integer cvv = Integer.parseInt(request.getCvv());
-        if (client.getWallet() != null) {
-            if (!client.getWallet().getCard().equals(request.getCardNumber())
-                    || !client.getWallet().getCvv().equals(cvv)
-                    || !client.getWallet().getValidThru().equals(request.getValidThru())
-            ) {
-                throw new IncorrectPaymentDataException();
-            }
-        } else if (request.getSavePaymentData()) {
+//        if (client.getWallet() != null) {
+//            if (!client.getWallet().getCard().equals(request.getCardNumber())
+//                    || !client.getWallet().getCvv().equals(cvv)
+//                    || !client.getWallet().getValidThru().equals(request.getValidThru())
+//            ) {
+//                throw new IncorrectPaymentDataException();
+//            }
+//        } else
+            if (request.getSavePaymentData()) {
             client.setWallet(WalletEmbeddable.builder()
                     .validThru(request.getValidThru())
                     .cvv(cvv)
