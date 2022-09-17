@@ -10,7 +10,9 @@ import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
 import farsharing.server.model.dto.response.IAuthResponse;
+import farsharing.server.model.entity.CarEntity;
 import farsharing.server.model.entity.ClientEntity;
+import farsharing.server.model.entity.ContractEntity;
 import farsharing.server.model.entity.UserEntity;
 import farsharing.server.model.entity.embeddable.WalletEmbeddable;
 import farsharing.server.model.entity.enumerate.ClientStatus;
@@ -221,16 +223,17 @@ public class ClientService {
         return this.clientRepository.findAll();
     }
 
-    public List<UUID> getCurrentClientAll(UUID clientUid) {
+    public List<CarEntity> getCurrentClientAll(UUID clientUid) {
         if (clientUid == null) {
             throw new RequestNotValidException();
         }
-        List<UUID> result = this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.APPROVED).stream()
-                .map(x -> x.getCar().getUid())
+        List<CarEntity> result = this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.APPROVED)
+                .stream()
+                .map(ContractEntity::getCar)
                 .collect(Collectors.toList());
         result.addAll(this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.ACTIVE)
                 .stream()
-                .map(x -> x.getCar().getUid())
+                .map(ContractEntity::getCar)
                 .collect(Collectors.toList()));
         return result;
     }
