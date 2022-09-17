@@ -22,9 +22,7 @@ import farsharing.server.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -227,14 +225,15 @@ public class ClientService {
         if (clientUid == null) {
             throw new RequestNotValidException();
         }
-        List<CarEntity> result = this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.APPROVED)
+        Set<CarEntity> result = this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.APPROVED)
                 .stream()
                 .map(ContractEntity::getCar)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         result.addAll(this.contractRepository.findAllByClientUidAndStatus(clientUid, ContractStatus.ACTIVE)
                 .stream()
                 .map(ContractEntity::getCar)
-                .collect(Collectors.toList()));
-        return result;
+                .collect(Collectors.toSet()));
+
+        return new ArrayList<>(result);
     }
 }
