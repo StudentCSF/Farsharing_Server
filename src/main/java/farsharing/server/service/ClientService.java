@@ -66,43 +66,49 @@ public class ClientService {
             throw new ClientAlreadyExistsException();
         }
 
-        UUID userUid = this.userService.addUser(
-                clientRequest.getEmail(),
-                clientRequest.getPassword()
-        );
+        try {
+            UUID userUid = this.userService.addUser(
+                    clientRequest.getEmail(),
+                    clientRequest.getPassword()
+            );
 
-        String cvv = this.stringHandlerComponent.emptyLikeNull(clientRequest.getCvv());
+            String cvv = this.stringHandlerComponent.emptyLikeNull(clientRequest.getCvv());
 
-        WalletEmbeddable wallet = WalletEmbeddable.builder()
-                .card(this.stringHandlerComponent.emptyLikeNull(clientRequest.getCardNumber()))
-                .cvv(cvv == null ? null : Integer.valueOf(cvv))
-                .validThru(this.stringHandlerComponent.emptyLikeNull(clientRequest.getValidThru()))
-                .build();
+            WalletEmbeddable wallet = WalletEmbeddable.builder()
+                    .card(this.stringHandlerComponent.emptyLikeNull(clientRequest.getCardNumber()))
+                    .cvv(cvv == null ? null : Integer.valueOf(cvv))
+                    .validThru(this.stringHandlerComponent.emptyLikeNull(clientRequest.getValidThru()))
+                    .build();
 
-        ClientEntity newClient = ClientEntity.builder()
-                .user(this.userService.getUser(userUid))
-                .wallet(wallet)
-                .uid(UUID.randomUUID())
-                .status(ClientStatus.DEFAULT)
-                .phoneNumber(clientRequest.getPhoneNumber())
-                .midName(this.stringHandlerComponent.emptyLikeNull(clientRequest.getMidName()))
-                .license(clientRequest.getLicense())
-                .accidents(0)
-                .address(this.stringHandlerComponent.emptyLikeNull(clientRequest.getAddress()))
-                .firstName(clientRequest.getFirstName())
-                .lastName(clientRequest.getLastName())
-                .build();
+            ClientEntity newClient = ClientEntity.builder()
+                    .user(this.userService.getUser(userUid))
+                    .wallet(wallet)
+                    .uid(UUID.randomUUID())
+                    .status(ClientStatus.DEFAULT)
+                    .phoneNumber(clientRequest.getPhoneNumber())
+                    .midName(this.stringHandlerComponent.emptyLikeNull(clientRequest.getMidName()))
+                    .license(clientRequest.getLicense())
+                    .accidents(0)
+                    .address(this.stringHandlerComponent.emptyLikeNull(clientRequest.getAddress()))
+                    .firstName(clientRequest.getFirstName())
+                    .lastName(clientRequest.getLastName())
+                    .build();
 
-        this.clientRepository.save(newClient);
+            this.clientRepository.save(newClient);
 
-        int code = this.mailSenderComponent.sendActivationCode(clientRequest.getEmail());
+            int code = this.mailSenderComponent.sendActivationCode(clientRequest.getEmail());
 
-        this.userService.setActivationCode(userUid, code);
+            this.userService.setActivationCode(userUid, code);
 
-        UserRequest ur = new UserRequest();
-        ur.setPassword(clientRequest.getPassword());
-        ur.setEmail(clientRequest.getEmail());
-        return this.userService.auth(ur, true);
+            UserRequest ur = new UserRequest();
+            ur.setPassword(clientRequest.getPassword());
+            ur.setEmail(clientRequest.getEmail());
+            return this.userService.auth(ur, true);
+        } catch (ClientAlreadyExistsException ex) {
+            return IAuthResponse.builder()
+                    .userUid(this.userService.findByLogin(clientRequest.getEmail()).getUid())
+                    .build();
+        }
     }
 
     private Boolean clientHasActiveContract(UUID clientUid) {
