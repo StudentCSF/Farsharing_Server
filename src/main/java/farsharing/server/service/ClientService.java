@@ -6,6 +6,7 @@ import farsharing.server.component.StringHandlerComponent;
 import farsharing.server.exception.ClientAlreadyExistsException;
 import farsharing.server.exception.ClientNotFoundException;
 import farsharing.server.exception.RequestNotValidException;
+import farsharing.server.exception.UserAlreadyExistsException;
 import farsharing.server.model.dto.request.ClientRequest;
 import farsharing.server.model.dto.request.UserRequest;
 import farsharing.server.model.dto.response.ClientDataResponse;
@@ -104,7 +105,7 @@ public class ClientService {
             ur.setPassword(clientRequest.getPassword());
             ur.setEmail(clientRequest.getEmail());
             return this.userService.auth(ur, true);
-        } catch (ClientAlreadyExistsException ex) {
+        } catch (UserAlreadyExistsException ex) {
             return IAuthResponse.builder()
                     .userUid(this.userService.findByLogin(clientRequest.getEmail()).getUid())
                     .build();
