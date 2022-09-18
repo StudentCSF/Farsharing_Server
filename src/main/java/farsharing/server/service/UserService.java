@@ -249,4 +249,10 @@ public class UserService {
         }
         return this.clientRepository.findAll(PageRequest.of(pageNumber, 6));
     }
+
+    public UserEntity findByLogin(String login) {
+        if (login != null && login.length() > 0) {
+            return this.userRepository.findByEmail(login).orElseThrow(ClientNotFoundException::new);
+        } else throw new RequestNotValidException();
+    }
 }
