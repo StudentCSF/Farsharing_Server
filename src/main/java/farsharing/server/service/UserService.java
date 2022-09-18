@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -170,7 +171,12 @@ public class UserService {
 
         if (user.getRole() == UserRole.ADMIN) {
             aa = AuthAdminResponse.builder()
-                    .clients(this.clientRepository.findAll())
+                    .clients(
+                            this.clientRepository.findAll()
+                                    .stream()
+                                    .filter(x -> x.getUser().getRole() != UserRole.DELETED)
+                                    .collect(Collectors.toList())
+                    )
                     .build();
             ac = null;
         } else if (user.getRole() == UserRole.CLIENT) {
